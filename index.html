@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanti Delta Spa - Claim Makan</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <div class="max-w-md mx-auto min-h-screen flex flex-col justify-center p-4">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-slate-800">KANTI DELTA SPA</h1>
+            <p class="text-slate-500">Sistem Jatah Makan Staff</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-xl">
+            <div id="reader" class="overflow-hidden rounded-lg bg-black"></div>
+            
+            <div id="result-message" class="hidden mt-4 p-4 rounded-lg text-center font-bold">
+                </div>
+
+            <div class="relative flex py-5 items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-400 text-sm">ATAU</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <div class="space-y-4">
+                <input type="text" id="nik-input" placeholder="Masukkan NIK Staff" 
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <button onclick="prosesManual()" 
+                    class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
+                    Klaim Jatah Makan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Inisialisasi Scanner
+        const html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
+
+        function onScanSuccess(decodedText) {
+            // Berhenti scan sebentar agar tidak double input
+            html5QrCode.pause();
+            verifikasiData(decodedText);
+        }
+
+        // 2. Fungsi Verifikasi (Simulasi ke Database)
+        function verifikasiData(idInput) {
+            const msgBox = document.getElementById('result-message');
+            msgBox.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
+
+            // SIMULASI: Cek ke database
+            console.log("Memeriksa ID:", idInput);
+            
+            // Contoh Logika Berhasil
+            msgBox.innerHTML = `✅ Berhasil! Selamat makan, Staff ID: ${idInput}`;
+            msgBox.classList.add('bg-green-100', 'text-green-700');
+
+            // Reset scanner setelah 3 detik
+            setTimeout(() => {
+                msgBox.classList.add('hidden');
+                html5QrCode.resume();
+            }, 3000);
+        }
+
+        function prosesManual() {
+            const nik = document.getElementById('nik-input').value;
+            if(nik) {
+                verifikasiData(nik);
+                document.getElementById('nik-input').value = "";
+            } else {
+                alert("Silakan masukkan NIK terlebih dahulu");
+            }
+        }
+    </script>
+</body>
+</html>
