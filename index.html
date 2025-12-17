@@ -67,16 +67,27 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Navigasi
-        function showPage(p) {
-            document.getElementById('page-scan').classList.toggle('hidden', p !== 'scan');
-            document.getElementById('page-admin').classList.toggle('hidden', p !== 'admin');
-            
-            document.getElementById('btn-scan').className = p === 'scan' ? 'font-bold text-blue-600 border-b-2 border-blue-600 pb-1' : 'font-bold text-gray-400 pb-1';
-            document.getElementById('btn-admin').className = p === 'admin' ? 'font-bold text-blue-600 border-b-2 border-blue-600 pb-1' : 'font-bold text-gray-400 pb-1';
-            
-            if(p === 'admin') muatLaporan();
+      // Ganti fungsi showPage lama dengan yang ini
+function showPage(p) {
+    if (p === 'admin') {
+        // Tentukan password Anda di sini (misal: "kanti123")
+        const password = prompt("Masukkan Password Admin:");
+        
+        if (password !== "kanti123") {
+            alert("Password Salah! Akses Ditolak.");
+            return; // Berhenti di sini jika salah
         }
+    }
+
+    // Jika password benar atau pindah ke halaman scan, jalankan kode ini
+    document.getElementById('page-scan').classList.toggle('hidden', p !== 'scan');
+    document.getElementById('page-admin').classList.toggle('hidden', p !== 'admin');
+    
+    document.getElementById('btn-scan').className = p === 'scan' ? 'font-bold text-blue-600 border-b-2 border-blue-600 pb-1' : 'font-bold text-gray-400 pb-1';
+    document.getElementById('btn-admin').className = p === 'admin' ? 'font-bold text-blue-600 border-b-2 border-blue-600 pb-1' : 'font-bold text-gray-400 pb-1';
+    
+    if(p === 'admin') muatLaporan();
+}
 
         // Simpan Staff (Admin)
         async function simpanStaff() {
@@ -146,3 +157,4 @@
     </script>
 </body>
 </html>
+
