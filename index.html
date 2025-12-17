@@ -3,82 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - Claim Makan</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <title>Kanti Delta Spa - Integrated</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-100 font-sans">
+<body class="bg-gray-50">
 
-    <div class="max-w-md mx-auto min-h-screen flex flex-col justify-center p-4">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-slate-800">KANTI DELTA SPA</h1>
-            <p class="text-slate-500">Sistem Jatah Makan Staff</p>
+    <nav class="bg-white shadow-md p-4 flex justify-center gap-4">
+        <button onclick="showPage('scan')" class="font-bold text-blue-600">SCAN ID</button>
+        <button onclick="showPage('admin')" class="font-bold text-gray-500">ADMIN</button>
+    </nav>
+
+    <div id="page-scan" class="max-w-md mx-auto p-6">
+        <div id="reader" class="rounded-lg overflow-hidden border-2 border-blue-500"></div>
+        <input type="text" id="nik-input" placeholder="Atau ketik NIK Manual" class="w-full p-3 border rounded-lg mt-4">
+        <button onclick="prosesMakan()" class="w-full bg-blue-600 text-white py-3 rounded-lg mt-2 font-bold">KLAIM JATAH MAKAN</button>
+        <div id="status" class="mt-4 p-4 rounded-lg hidden text-center font-bold"></div>
+    </div>
+
+    <div id="page-admin" class="hidden max-w-md mx-auto p-6">
+        <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+            <h2 class="font-bold mb-4">Tambah Staff</h2>
+            <input type="text" id="add-nama" placeholder="Nama Staff" class="w-full p-2 border rounded mb-2">
+            <input type="text" id="add-nik" placeholder="NIK" class="w-full p-2 border rounded mb-2">
+            <button onclick="simpanStaff()" class="w-full bg-green-600 text-white py-2 rounded">Simpan ke Database</button>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-xl">
-            <div id="reader" class="overflow-hidden rounded-lg bg-black"></div>
-            
-            <div id="result-message" class="hidden mt-4 p-4 rounded-lg text-center font-bold">
-                </div>
-
-            <div class="relative flex py-5 items-center">
-                <div class="flex-grow border-t border-gray-300"></div>
-                <span class="flex-shrink mx-4 text-gray-400 text-sm">ATAU</span>
-                <div class="flex-grow border-t border-gray-300"></div>
-            </div>
-
-            <div class="space-y-4">
-                <input type="text" id="nik-input" placeholder="Masukkan NIK Staff" 
-                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                <button onclick="prosesManual()" 
-                    class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
-                    Klaim Jatah Makan
-                </button>
-            </div>
+        <div class="bg-white p-4 rounded-xl shadow-md">
+            <h2 class="font-bold mb-4 text-sm">Laporan Makan Hari Ini</h2>
+            <div id="log-list" class="text-xs space-y-2"></div>
         </div>
     </div>
 
     <script>
-        // 1. Inisialisasi Scanner
-        const html5QrCode = new Html5Qrcode("reader");
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
-
-        function onScanSuccess(decodedText) {
-            // Berhenti scan sebentar agar tidak double input
-            html5QrCode.pause();
-            verifikasiData(decodedText);
+        function showPage(p) {
+            document.getElementById('page-scan').classList.toggle('hidden', p !== 'scan');
+            document.getElementById('page-admin').classList.toggle('hidden', p !== 'admin');
+            if(p === 'admin') muatLaporan();
         }
 
-        // 2. Fungsi Verifikasi (Simulasi ke Database)
-        function verifikasiData(idInput) {
-            const msgBox = document.getElementById('result-message');
-            msgBox.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
-
-            // SIMULASI: Cek ke database
-            console.log("Memeriksa ID:", idInput);
-            
-            // Contoh Logika Berhasil
-            msgBox.innerHTML = `✅ Berhasil! Selamat makan, Staff ID: ${idInput}`;
-            msgBox.classList.add('bg-green-100', 'text-green-700');
-
-            // Reset scanner setelah 3 detik
-            setTimeout(() => {
-                msgBox.classList.add('hidden');
-                html5QrCode.resume();
-            }, 3000);
+        // SIMPAN STAFF KE DATABASE
+        async function simpanStaff() {
+            const nama = document.getElementById('add-nama').value;
+            const nik = document.getElementById('add-nik').value;
+            const { error } = await supabase.from('staff').insert([{ nik, nama }]);
+            if (error) alert("Gagal: " + error.message);
+            else { alert("Staff Tersimpan!"); document.getElementById('add-nama').value=''; document.getElementById('add-nik').value=''; }
         }
 
-        function prosesManual() {
+        // PROSES MAKAN (SCAN/MANUAL)
+        async function prosesMakan() {
             const nik = document.getElementById('nik-input').value;
-            if(nik) {
-                verifikasiData(nik);
-                document.getElementById('nik-input').value = "";
+            const statusBox = document.getElementById('status');
+            
+            // Cek apakah NIK terdaftar
+            const { data: staff } = await supabase.from('staff').select('*').eq('nik', nik).single();
+
+            if (staff) {
+                // Simpan ke laporan_makan
+                await supabase.from('laporan_makan').insert([{ nik_staff: nik, nama_staff: staff.nama }]);
+                statusBox.innerHTML = "✅ Berhasil! Selamat Makan " + staff.nama;
+                statusBox.className = "mt-4 p-4 rounded-lg bg-green-100 text-green-700 font-bold";
             } else {
-                alert("Silakan masukkan NIK terlebih dahulu");
+                statusBox.innerHTML = "❌ NIK Tidak Ditemukan!";
+                statusBox.className = "mt-4 p-4 rounded-lg bg-red-100 text-red-700 font-bold";
             }
+            statusBox.classList.remove('hidden');
         }
+
+        // AMBIL LAPORAN UNTUK ADMIN
+        async function muatLaporan() {
+            const { data } = await supabase.from('laporan_makan').select('*').order('waktu', { ascending: false });
+            const list = document.getElementById('log-list');
+            list.innerHTML = data.map(l => `<div class="border-b py-1 flex justify-between"><span>${l.nama_staff}</span><span>${new Date(l.waktu).toLocaleTimeString()}</span></div>`).join('');
+        }
+
+        // SCANNER QR
+        const scanner = new Html5Qrcode("reader");
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => {
+            document.getElementById('nik-input').value = txt;
+            prosesMakan();
+        });
     </script>
 </body>
 </html>
