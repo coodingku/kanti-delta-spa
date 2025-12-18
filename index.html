@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - ERP v6.4 Final</title>
+    <title>Kanti Delta Spa - ERP v6.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
@@ -22,11 +22,11 @@
     <div id="modal-regis" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl modal-animate border">
             <h3 class="text-xl font-bold mb-2 text-slate-800">👋 Daftar Staff Baru</h3>
-            <p class="text-xs text-slate-400 mb-6">Silakan isi data Anda dengan benar.</p>
+            <p class="text-xs text-slate-400 mb-6">ID Anda akan dibuatkan secara otomatis oleh sistem.</p>
             <div class="space-y-4">
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID / NIK (Tentukan Sendiri)</label>
-                    <input type="text" id="reg-nik" placeholder="Contoh: 101 atau KD-001" class="w-full p-3 border rounded-xl bg-white font-mono font-bold text-blue-600 outline-none focus:border-blue-500 uppercase">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID / NIK Anda (Otomatis)</label>
+                    <input type="text" id="reg-nik" class="w-full p-3 border rounded-xl bg-slate-100 font-mono font-bold text-blue-600 outline-none" readonly>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Lengkap</label>
@@ -97,11 +97,11 @@
             <nav class="flex-1 px-4 space-y-1 text-sm font-medium">
                 <button onclick="switchAdminSubPage('staff')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition">👥 Data Staff</button>
                 <button onclick="switchAdminSubPage('master-divisi')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition">🏢 Master Divisi</button>
-                <button onclick="switchAdminSubPage('menu-makan')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition">🍱 Update Menu</button>
+                <button onclick="switchAdminSubPage('menu-makan')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition text-orange-400">🍱 Update Menu</button>
                 <hr class="border-slate-800 my-2">
                 <button onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition text-green-400 font-bold">✅ Lap. Scan</button>
                 <button onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition text-blue-400 font-bold">📊 Lap. Jatah</button>
-                <div class="pt-10"><button onclick="showPage('scan')" class="w-full p-3 text-red-400 border border-red-500/20 text-xs text-center font-bold uppercase rounded-xl">⬅ Keluar</button></div>
+                <div class="pt-10"><button onclick="showPage('scan')" class="w-full p-3 text-red-400 border border-red-500/20 text-xs text-center font-bold uppercase rounded-xl hover:bg-red-500/10 transition">⬅ Keluar</button></div>
             </nav>
         </aside>
 
@@ -143,7 +143,7 @@
                     <button onclick="muatLaporanScan()" class="bg-blue-600 text-white p-3.5 rounded-xl font-bold uppercase">Filter</button>
                     <button onclick="exportLaporanScan()" class="bg-green-600 text-white p-3.5 rounded-xl font-bold uppercase">CSV</button>
                 </div>
-                <div class="bg-white rounded-3xl border overflow-hidden"><table class="w-full text-left"><tbody id="scan-table-body" class="divide-y"></tbody></table></div>
+                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm"><table class="w-full text-left"><tbody id="scan-table-body" class="divide-y"></tbody></table></div>
             </section>
 
             <section id="sub-laporan-detail" class="admin-subpage hidden">
@@ -154,7 +154,7 @@
                     <button onclick="muatLaporanDetail()" class="bg-blue-600 text-white p-3.5 rounded-xl font-bold uppercase">Cari</button>
                     <button onclick="exportLaporanDetail()" class="bg-green-600 text-white p-3.5 rounded-xl font-bold uppercase">CSV</button>
                 </div>
-                <div class="bg-white rounded-3xl border overflow-hidden"><table class="w-full text-left"><tbody id="detail-table-body" class="divide-y"></tbody></table></div>
+                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm"><table class="w-full text-left"><tbody id="detail-table-body" class="divide-y"></tbody></table></div>
             </section>
         </main>
     </div>
@@ -193,12 +193,26 @@
             if(sub === 'laporan-detail') { document.getElementById('det-filter-date').valueAsDate = new Date(); muatDivisiKeFilter('det-filter-divisi'); muatLaporanDetail(); }
         }
 
-        // --- REGISTRASI MANDIRI (LOGIKA BARU: MANUAL NIK + WARNING) ---
+        // --- REGISTRASI MANDIRI (AUTO NIK + WARNING ONLY) ---
         async function openRegisModal() {
-            document.getElementById('reg-nik').value = '';
             document.getElementById('reg-nama').value = '';
             document.getElementById('modal-regis').classList.remove('hidden');
             
+            // Generate NIK Otomatis
+            try {
+                const { data: allStaff } = await _supabase.from('staff').select('nik');
+                let nextNum = 1;
+                if (allStaff && allStaff.length > 0) {
+                    const nums = allStaff.map(s => {
+                        const m = s.nik.match(/\d+/);
+                        return m ? parseInt(m[0]) : 0;
+                    });
+                    nextNum = Math.max(...nums) + 1;
+                }
+                document.getElementById('reg-nik').value = "KD-" + nextNum.toString().padStart(3, '0');
+            } catch (e) { document.getElementById('reg-nik').value = "KD-001"; }
+
+            // Muat Divisi
             const { data: divData } = await _supabase.from('master_divisi').select('nama_divisi').order('nama_divisi');
             if(divData) {
                 document.getElementById('reg-divisi').innerHTML = divData.map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
@@ -208,69 +222,72 @@
         function closeRegisModal() { document.getElementById('modal-regis').classList.add('hidden'); }
 
         async function prosesSimpanMandiri() {
-            const nik = document.getElementById('reg-nik').value.trim().toUpperCase();
+            const nik = document.getElementById('reg-nik').value;
             const nama = document.getElementById('reg-nama').value.trim();
             const divisi = document.getElementById('reg-divisi').value;
             const btn = document.getElementById('btn-regis-submit');
 
-            if (!nik || !nama) return alert("PERINGATAN: ID/NIK dan Nama tidak boleh kosong!");
+            if (!nama) return alert("PERINGATAN: Nama Lengkap tidak boleh kosong!");
             
             btn.disabled = true; btn.innerText = "Memproses...";
 
-            // 1. Cek NIK Kembar
-            const { data: cekNik } = await _supabase.from('staff').select('nama').eq('nik', nik).maybeSingle();
-            if(cekNik) {
-                alert(`MAAF: ID "${nik}" sudah dipakai oleh ${cekNik.nama}. Pilih ID lain.`);
-                btn.disabled = false; btn.innerText = "Daftar Sekarang";
-                return;
-            }
-
-            // 2. Simpan Data
+            // Simpan Data
             const { error } = await _supabase.from('staff').insert([{ nik, nama, divisi, is_active: true }]);
             
             if (error) {
                 alert("Gagal daftar: " + error.message);
                 btn.disabled = false; btn.innerText = "Daftar Sekarang";
             } else {
-                // Notifikasi Peringatan Penting
+                // NOTIFIKASI PENTING (Hanya Memberi Tahu ID)
                 alert(
                     "BERHASIL TERDAFTAR!\n\n" +
                     "⚠️ PENTING: Mohon catat/simpan ID Anda:\n" +
                     "👉 [" + nik + "]\n\n" +
-                    "Gunakan ID ini untuk scan klaim makan setiap hari. Jangan sampai lupa!"
+                    "Silakan masukkan ID tersebut di layar utama untuk klaim makan."
                 );
                 closeRegisModal();
+                // Reset dan fokus ke input scan (Tanpa Klaim Otomatis)
                 document.getElementById('nik-input').value = '';
                 document.getElementById('nik-input').focus();
             }
         }
 
-        // --- LOGIKA KLAIM MAKAN ---
+        // --- LOGIKA KLAIM MAKAN (MANUAL INPUT) ---
         async function prosesKlaim() {
-            const input = document.getElementById('nik-input'); const nik = input.value.trim().toUpperCase(); const box = document.getElementById('status-msg');
+            const input = document.getElementById('nik-input'); 
+            const nik = input.value.trim().toUpperCase(); 
+            const box = document.getElementById('status-msg');
+            
             if(!nik) return;
+            
             const { data: s } = await _supabase.from('staff').select('*').eq('nik', nik).maybeSingle();
+            
             box.classList.remove('hidden', 'bg-green-100', 'bg-red-100', 'bg-yellow-100', 'bg-slate-800', 'text-white', 'text-green-700', 'text-red-700', 'text-yellow-800');
+            
             if(s) {
                 if(!s.is_active) {
-                    box.innerHTML = "🚫 ID NON-AKTIF"; box.className = "p-4 rounded-2xl font-bold bg-slate-800 text-white mb-6 text-center";
+                    box.innerHTML = "🚫 ID NON-AKTIF"; box.className = "p-4 rounded-2xl font-bold bg-slate-800 text-white mb-6 text-center shadow-md";
                 } else {
                     const tgl = new Date().toISOString().split('T')[0];
                     const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${tgl}T00:00:00Z`).lte('waktu', `${tgl}T23:59:59Z`);
+                    
                     if(su && su.length >= 1) {
-                        box.innerHTML = `⚠️ JATAH HABIS: ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-yellow-100 text-yellow-800 mb-6 text-center";
+                        box.innerHTML = `⚠️ JATAH HABIS: ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-yellow-100 text-yellow-800 mb-6 text-center border-yellow-200 shadow-sm";
                     } else {
                         await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi || 'Staff' }]);
-                        box.innerHTML = `✅ BERHASIL: Selamat makan, ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-green-100 text-green-700 mb-6 text-center animate-bounce border-green-200";
+                        box.innerHTML = `✅ BERHASIL: Selamat makan, ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-green-100 text-green-700 mb-6 text-center animate-bounce border-green-200 shadow-md";
                     }
                 }
             } else {
-                box.innerHTML = "❌ ID TIDAK TERDAFTAR!"; box.className = "p-4 rounded-2xl font-bold bg-red-100 text-red-700 mb-6 text-center border-red-200";
+                box.innerHTML = "❌ ID TIDAK TERDAFTAR!"; box.className = "p-4 rounded-2xl font-bold bg-red-100 text-red-700 mb-6 text-center border-red-200 shadow-sm";
             }
-            input.value = ''; input.focus(); box.classList.remove('hidden'); setTimeout(() => box.classList.add('hidden'), 5000);
+            
+            input.value = ''; input.focus(); 
+            box.classList.remove('hidden'); 
+            setTimeout(() => box.classList.add('hidden'), 5000);
         }
 
-        // --- ADMIN: STAFF & DIVISI ---
+        // --- ADMIN FUNCTIONS (STAFF, DIVISI, MENU, LAPORAN) ---
         async function muatStaff() {
             const { data } = await _supabase.from('staff').select('*').order('is_active', {ascending: false}).order('nama');
             document.getElementById('staff-table-body').innerHTML = (data || []).map(s => `
@@ -286,8 +303,7 @@
         async function simpanStaff() {
             const n = document.getElementById('add-nama').value; const k = document.getElementById('add-nik').value; const d = document.getElementById('add-divisi-select').value;
             if(!n || !k) return alert("Isi ID & Nama");
-            const { error } = await _supabase.from('staff').insert([{ nik: k.toUpperCase(), nama: n, divisi: d, is_active: true }]);
-            if(error) alert("Error: " + error.message);
+            await _supabase.from('staff').insert([{ nik: k.toUpperCase(), nama: n, divisi: d, is_active: true }]);
             document.getElementById('add-nama').value = ''; document.getElementById('add-nik').value = ''; muatStaff();
         }
 
@@ -299,8 +315,10 @@
         function closeEditModal() { document.getElementById('modal-edit').classList.add('hidden'); }
 
         async function updateStaff() {
-            const old = document.getElementById('edit-old-nik').value; const n = document.getElementById('edit-nama').value;
-            const d = document.getElementById('edit-divisi').value; const s = document.getElementById('edit-status').value === "true";
+            const old = document.getElementById('edit-old-nik').value;
+            const n = document.getElementById('edit-nama').value;
+            const d = document.getElementById('edit-divisi').value;
+            const s = document.getElementById('edit-status').value === "true";
             await _supabase.from('staff').update({ nama: n, divisi: d, is_active: s }).eq('nik', old);
             closeEditModal(); muatStaff();
         }
@@ -308,7 +326,10 @@
         async function muatDivisi() {
             const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
             document.getElementById('divisi-list').innerHTML = (data || []).map(d => `
-                <div class="bg-white p-3 border rounded-xl flex justify-between items-center shadow-sm"><span class="font-bold text-xs uppercase">${d.nama_divisi}</span><button onclick="hapusDivisi(${d.id})" class="text-red-400 font-bold text-[10px]">HAPUS</button></div>
+                <div class="bg-white p-3 border rounded-xl flex justify-between items-center shadow-sm">
+                    <span class="font-bold text-xs uppercase">${d.nama_divisi}</span>
+                    <button onclick="hapusDivisi(${d.id})" class="text-red-400 font-bold text-[10px]">HAPUS</button>
+                </div>
             `).join('');
         }
         async function simpanDivisi() { 
@@ -329,7 +350,6 @@
             if(document.getElementById('edit-divisi')) document.getElementById('edit-divisi').innerHTML = h;
         }
 
-        // --- LAPORAN & MENU ---
         async function muatLaporanScan() {
             const tgl = document.getElementById('scan-filter-date').value; const div = document.getElementById('scan-filter-divisi').value;
             let q = _supabase.from('laporan_makan').select('*').gte('waktu', `${tgl}T00:00:00Z`).lte('waktu', `${tgl}T23:59:59Z`);
@@ -362,7 +382,8 @@
         async function simpanMenu() {
             const m = document.getElementById('input-menu-hari-ini').value; const h = document.getElementById('input-harga-menu').value || 0;
             const t = new Date().toISOString().split('T')[0];
-            await _supabase.from('menu_harian').upsert({ tanggal: t, nama_menu: m, harga: h }, { onConflict: 'tanggal' }); alert("Menu Update!"); muatMenuHarianDisplay();
+            await _supabase.from('menu_harian').upsert({ tanggal: t, nama_menu: m, harga: h }, { onConflict: 'tanggal' }); 
+            alert("Menu Berhasil Update!"); muatMenuHarianDisplay();
         }
 
         async function muatMenuHarianInput() {
