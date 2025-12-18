@@ -475,34 +475,6 @@
             finally { btn.disabled = false; btn.innerText = "Daftar"; }
         }
 
-        async function muatRekapBulanan() {
-    const bulanInput = document.getElementById('rekap-bulan').value; // Format: YYYY-MM
-    const div = document.getElementById('det-filter-divisi').value;
-    if(!bulanInput) return alert("Pilih bulan terlebih dahulu");
-
-    // Ambil data klaim selama sebulan penuh
-    const { data: klaims } = await _supabase.from('laporan_makan')
-        .select('nik_staff, waktu')
-        .gte('waktu', `${bulanInput}-01T00:00:00`)
-        .lte('waktu', `${bulanInput}-31T23:59:59`);
-
-    // Ambil data staff
-    let qs = _supabase.from('staff').select('*');
-    if(div !== 'SEMUA') qs = qs.eq('divisi', div);
-    const { data: staffs } = await qs.order('nama');
-
-    document.getElementById('detail-table-body').innerHTML = (staffs || []).map(s => {
-        // Hitung berapa kali staff ini makan dalam sebulan
-        const totalMakan = (klaims || []).filter(x => x.nik_staff === s.nik).length;
-        return `
-            <tr>
-                <td class="p-4 font-bold uppercase">${s.nama}</td>
-                <td class="p-4 text-center font-black">${totalMakan}x Makan</td>
-                <td class="p-4 text-right font-bold text-blue-600">${formatIDR(totalMakan * 15000)}</td>
-            </tr>`;
-    }).join('');
-}
-
         // --- REPORTS & PDF ---
         async function muatLaporanScan() {
             const t = document.getElementById('scan-filter-date').value;
@@ -661,6 +633,7 @@
     </script>
 </body>
 </html>
+
 
 
 
