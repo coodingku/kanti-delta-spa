@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kantin Delta Spa - ERP v7.8</title>
+    <title>Kanti Delta Spa - ERP v7.9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
 
     <div id="page-scan" class="min-h-screen flex flex-col">
         <nav class="bg-white shadow-sm p-4 flex justify-between items-center px-6 border-b">
-            <h1 class="font-black text-slate-800 text-xl tracking-tighter uppercase">Kantin <span class="text-blue-600">Delta Spa</span></h1>
+            <h1 class="font-black text-slate-800 text-xl tracking-tighter uppercase">Kanti <span class="text-blue-600">Delta Spa</span></h1>
             <button onclick="showPage('admin')" class="text-[10px] font-bold text-slate-400 border px-3 py-1 rounded-full">Admin Panel</button>
         </nav>
         
@@ -66,7 +66,7 @@
 
             <div id="scan-container" class="hidden max-w-md w-full bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-50 text-center">
                 <div id="status-msg" class="hidden p-4 rounded-2xl font-bold text-sm mb-6 border"></div>
-                <input type="text" id="nik-input" autofocus placeholder="MASUKKAN ID" class="w-full p-5 border-2 rounded-2xl text-center text-2xl font-bold uppercase focus:border-blue-500 mb-6 outline-none">
+                <input type="text" id="nik-input" autofocus placeholder="MASUKKAN ID / NIK" class="w-full p-5 border-2 rounded-2xl text-center text-2xl font-bold uppercase focus:border-blue-500 mb-6 outline-none">
                 <button onclick="prosesKlaim()" class="w-full bg-blue-600 text-white font-bold py-5 rounded-2xl shadow-lg active:scale-95 uppercase tracking-widest mb-6">Klaim Makan</button>
                 <div class="border-t pt-6">
                     <button onclick="openRegisModal()" class="px-6 py-2 border-2 border-green-500 text-green-600 rounded-full font-black text-[10px] uppercase hover:bg-green-50 transition">Daftar ID Baru</button>
@@ -89,6 +89,8 @@
                 <hr class="border-slate-800 my-4">
                 <button onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition text-green-400 font-bold">✅ Lap. Scan</button>
                 <button onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition text-blue-400 font-bold">📊 Lap. Jatah</button>
+                <hr class="border-slate-800 my-4">
+                <button onclick="resetAllData()" class="w-full text-left p-3.5 hover:bg-red-600 text-red-400 hover:text-white rounded-xl transition font-bold text-xs uppercase">🔥 Reset All Data</button>
                 <div class="mt-10"><button onclick="showPage('scan')" class="w-full p-3 text-red-400 text-xs font-bold uppercase rounded-xl border border-red-500/20 hover:bg-red-500/10">⬅ Keluar</button></div>
             </nav>
         </aside>
@@ -98,9 +100,7 @@
             <section id="sub-staff" class="admin-subpage hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold uppercase">Manajemen Staff</h2>
-                    <div class="flex gap-2">
-                        <button onclick="exportStaffData()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📤 Export Data</button>
-                    </div>
+                    <button onclick="exportStaffData()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📤 Export CSV</button>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border grid grid-cols-4 gap-4 items-end mb-6 shadow-sm">
                     <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2.5 border rounded-xl font-mono uppercase"></div>
@@ -114,7 +114,7 @@
             </section>
 
             <section id="sub-master-divisi" class="admin-subpage hidden">
-                <h2 class="text-2xl font-bold mb-6">Master Divisi / Dept</h2>
+                <h2 class="text-2xl font-bold mb-6">Master Divisi</h2>
                 <div class="bg-white p-6 rounded-3xl border mb-6 flex gap-4 max-w-md shadow-sm">
                     <input type="text" id="new-divisi-name" class="flex-1 p-3 border rounded-xl" placeholder="Nama Divisi Baru">
                     <button onclick="simpanDivisi()" class="bg-blue-600 text-white px-6 rounded-xl font-bold uppercase">Tambah</button>
@@ -175,7 +175,61 @@
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
-        // --- CORE: AUTO HIDE SCAN ---
+        // --- EXPORT TOOLS ---
+        function downloadCSV(name, csv) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', name); a.click();
+        }
+
+        function exportStaffData() {
+            let csv = "NIK,Nama,Status,Divisi\n";
+            document.querySelectorAll("#staff-table-body tr").forEach(tr => {
+                const cols = Array.from(tr.querySelectorAll("td")).map(td => td.innerText.replace(/,/g, ''));
+                csv += cols.slice(0, 4).join(",") + "\n";
+            });
+            downloadCSV("Master_Staff.csv", csv);
+        }
+
+        function exportLaporanScan() {
+            let csv = "Waktu,Nama,Divisi\n";
+            document.querySelectorAll("#scan-table-body tr").forEach(tr => {
+                const cols = Array.from(tr.querySelectorAll("td")).map(td => td.innerText.replace(/,/g, ''));
+                csv += cols.join(",") + "\n";
+            });
+            downloadCSV("Laporan_Scan.csv", csv);
+        }
+
+        function exportLaporanDetail() {
+            let csv = "Nama,Status,Biaya\n";
+            document.querySelectorAll("#detail-table-body tr").forEach(tr => {
+                const cols = Array.from(tr.querySelectorAll("td")).map(td => td.innerText.replace(/,/g, ''));
+                csv += cols.join(",") + "\n";
+            });
+            downloadCSV("Rekap_Biaya.csv", csv);
+        }
+
+        // --- RESET DATA (SECURITY) ---
+        async function resetAllData() {
+            const confirm1 = confirm("⚠️ PERINGATAN KERAS!\n\nAnda akan menghapus SEMUA data Staff dan SEMUA Laporan Scan.\n\nApakah Anda yakin?");
+            if (!confirm1) return;
+
+            const confirmText = prompt("Ketik kata 'HAPUS' untuk melanjutkan:");
+            if (confirmText !== 'HAPUS') return alert("Reset dibatalkan. Kata kunci salah.");
+
+            try {
+                // Hapus data dari semua tabel utama
+                await _supabase.from('laporan_makan').delete().neq('id', 0); // Hapus semua baris
+                await _supabase.from('staff').delete().neq('nik', '0'); // Hapus semua staff
+                
+                alert("✅ SEMUA DATA BERHASIL DIRESET.");
+                location.reload(); // Refresh halaman
+            } catch (e) {
+                alert("Gagal reset: " + e.message);
+            }
+        }
+
+        // --- CORE FUNCTIONS ---
         async function sinkronisasiMenu() {
             const tgl = new Date().toISOString().split('T')[0];
             const { data } = await _supabase.from('menu_harian').select('nama_menu').eq('tanggal', tgl).maybeSingle();
@@ -191,13 +245,6 @@
             }
         }
 
-        // --- DAFTAR MANDIRI ANTI BENTROK ---
-        async function openRegisModal() {
-            await muatDivisiKeDropdown('reg-divisi');
-            document.getElementById('modal-regis').classList.remove('hidden');
-        }
-        function closeRegisModal() { document.getElementById('modal-regis').classList.add('hidden'); }
-
         async function prosesSimpanMandiri() {
             const btn = document.getElementById('btn-submit-regis');
             const n = document.getElementById('reg-nama').value.trim();
@@ -209,62 +256,19 @@
                 const { data: allStaff } = await _supabase.from('staff').select('nik');
                 let maxNum = 0;
                 (allStaff || []).forEach(s => {
-                    const parts = s.nik.split('-');
-                    if(parts.length > 1){
-                        const num = parseInt(parts[1]);
-                        if(num > maxNum) maxNum = num;
-                    }
+                    const num = parseInt(s.nik.split('-')[1]);
+                    if(num > maxNum) maxNum = num;
                 });
-                
                 const newNik = `KD-${(maxNum + 1).toString().padStart(3, '0')}`;
-                const { error } = await _supabase.from('staff').insert({ nik: newNik, nama: n.toUpperCase(), divisi: d, is_active: true });
-                if(error) throw error;
-
+                await _supabase.from('staff').insert({ nik: newNik, nama: n.toUpperCase(), divisi: d, is_active: true });
                 alert(`✅ BERHASIL!\nID ANDA: ${newNik}`);
                 document.getElementById('reg-nama').value = "";
                 closeRegisModal();
-            } catch (e) {
-                alert("Gagal daftar: " + e.message);
-            } finally {
-                btn.disabled = false; btn.innerText = "Simpan & Daftar";
-            }
+            } catch (e) { alert("Error: " + e.message); }
+            finally { btn.disabled = false; btn.innerText = "Simpan & Daftar"; }
         }
 
-        // --- EXPORT FUNCTIONS (RE-ADDED) ---
-        function downloadCSV(name, csv) {
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', name); a.click();
-        }
-
-        function exportStaffData() {
-            let csv = "NIK,Nama,Status,Divisi\n";
-            document.querySelectorAll("#staff-table-body tr").forEach(tr => {
-                const row = Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join(",");
-                csv += row + "\n";
-            });
-            downloadCSV("Data_Staff.csv", csv);
-        }
-
-        function exportLaporanScan() {
-            let csv = "Waktu,Nama Staff,Divisi\n";
-            document.querySelectorAll("#scan-table-body tr").forEach(tr => {
-                const row = Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join(",");
-                csv += row + "\n";
-            });
-            downloadCSV("Laporan_Scan_Harian.csv", csv);
-        }
-
-        function exportLaporanDetail() {
-            let csv = "Nama Staff,Status Scan,Biaya\n";
-            document.querySelectorAll("#detail-table-body tr").forEach(tr => {
-                const row = Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join(",");
-                csv += row + "\n";
-            });
-            downloadCSV("Rekap_Biaya_Makan.csv", csv);
-        }
-
-        // --- ADMIN FUNCTIONS ---
+        // --- ADMIN HELPERS ---
         async function muatStaff() {
             const { data } = await _supabase.from('staff').select('*').order('nama');
             document.getElementById('staff-table-body').innerHTML = (data || []).map(s => `
@@ -275,6 +279,15 @@
                     <td class="p-4 uppercase font-bold text-slate-400">${s.divisi || '-'}</td>
                     <td class="p-4 text-right"><button onclick="openEditModal('${s.nik}', '${s.nama}', '${s.divisi}', ${s.is_active})" class="text-blue-500 font-bold uppercase">Edit</button></td>
                 </tr>`).join('');
+        }
+
+        async function simpanStaff() {
+            const n = document.getElementById('add-nama').value;
+            const k = document.getElementById('add-nik').value;
+            const d = document.getElementById('add-divisi-select').value;
+            if(!n || !k) return alert("NIK & Nama wajib!");
+            await _supabase.from('staff').insert([{ nik: k.toUpperCase(), nama: n.toUpperCase(), divisi: d, is_active: true }]);
+            muatStaff();
         }
 
         async function muatDivisi() {
@@ -320,7 +333,7 @@
             }).join('');
         }
 
-        // --- UI HELPERS ---
+        // --- NAVIGATION ---
         function showPage(p) {
             if(p==='admin') { if(prompt("Pass:")!=="kanti123") return; document.getElementById('page-admin').classList.remove('hidden'); document.getElementById('page-scan').classList.add('hidden'); switchAdminSubPage('staff'); }
             else { document.getElementById('page-admin').classList.add('hidden'); document.getElementById('page-scan').classList.remove('hidden'); sinkronisasiMenu(); }
@@ -362,7 +375,6 @@
         }
 
         async function hapusMenuHariIni() {
-            if(!confirm("Hapus?")) return;
             const t = new Date().toISOString().split('T')[0];
             await _supabase.from('menu_harian').delete().eq('tanggal', t);
             sinkronisasiMenu();
@@ -378,10 +390,10 @@
             if(s && s.is_active) {
                 const t = new Date().toISOString().split('T')[0];
                 const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
-                if(su.length > 0) { box.innerText = "Mohon Maaf Jatah Anda habis Maximal Jatah Perhari hanya 1x"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
+                if(su.length > 0) { box.innerText = "JATAH HABIS"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
                 else {
                     await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi }]);
-                    box.innerText = "BERHASIL Silahkan Makan Kaka: " + s.nama; box.className = "p-4 rounded-xl bg-green-100 text-green-700 mb-4 font-bold";
+                    box.innerText = "BERHASIL: " + s.nama; box.className = "p-4 rounded-xl bg-green-100 text-green-700 mb-4 font-bold";
                 }
             } else { box.innerText = "ID TIDAK AKTIF"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
             input.value = ''; setTimeout(() => box.classList.add('hidden'), 3000);
@@ -392,9 +404,11 @@
             document.getElementById('date-display').innerText = n.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
             if(n.getSeconds() % 15 === 0) sinkronisasiMenu();
         }
+        function openRegisModal() { muatDivisiKeDropdown('reg-divisi'); document.getElementById('modal-regis').classList.remove('hidden'); }
+        function closeRegisModal() { document.getElementById('modal-regis').classList.add('hidden'); }
+
         setInterval(updateClock, 1000); updateClock(); sinkronisasiMenu();
         document.getElementById('nik-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') prosesKlaim(); });
     </script>
 </body>
 </html>
-
