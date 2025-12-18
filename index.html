@@ -265,19 +265,24 @@
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
         // --- NAVIGATION ---
-        function showPage(p) {
-            if(p === 'admin') {
-                const pass = prompt("Password Admin:");
-                if(pass !== "kantin123") return; 
-                document.getElementById('page-admin').classList.remove('hidden');
-                document.getElementById('page-scan').classList.add('hidden');
-                switchAdminSubPage('dashboard');
-            } else {
-                document.getElementById('page-admin').classList.add('hidden');
-                document.getElementById('page-scan').classList.remove('hidden');
-                sinkronisasiMenu();
-            }
+      function showPage(p) {
+    if(p === 'admin') {
+        const pass = prompt("Password Admin:");
+        if(pass === "kantin123") {
+            // Memaksa pindah halaman tanpa menunggu koneksi database
+            document.getElementById('page-admin').classList.remove('hidden');
+            document.getElementById('page-scan').classList.add('hidden');
+            switchAdminSubPage('dashboard');
+            alert("Login Berhasil!");
+        } else {
+            alert("Password Salah!");
         }
+    } else {
+        document.getElementById('page-admin').classList.add('hidden');
+        document.getElementById('page-scan').classList.remove('hidden');
+        sinkronisasiMenu();
+    }
+}
 
         async function switchAdminSubPage(sub) {
             document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
@@ -513,3 +518,4 @@
     </script>
 </body>
 </html>
+
