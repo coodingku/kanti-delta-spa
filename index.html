@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - ERP v8.6</title>
+    <title>Kantin Delta Spa - ERP v8.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
 
     <div id="page-scan" class="min-h-screen flex flex-col">
         <nav class="bg-white shadow-sm p-4 flex justify-between items-center px-6 border-b">
-            <h1 class="font-black text-slate-800 text-xl tracking-tighter uppercase">Kanti <span class="text-blue-600">Delta Spa</span></h1>
+            <h1 class="font-black text-slate-800 text-xl tracking-tighter uppercase">Kantin <span class="text-blue-600">Delta Spa</span></h1>
             <button onclick="showPage('admin')" class="text-[10px] font-bold text-slate-400 border px-3 py-1 rounded-full">Admin Panel</button>
         </nav>
         
@@ -205,7 +205,7 @@
                 menuDisplay.innerText = data.nama_menu;
                 scanBox.classList.remove('hidden'); noMenuMsg.classList.add('hidden');
             } else {
-                menuDisplay.innerText = "MENU BELUM DIINPUT";
+                menuDisplay.innerText = "MENU BELUM DIUPDATE";
                 scanBox.classList.add('hidden'); noMenuMsg.classList.remove('hidden');
             }
         }
@@ -220,10 +220,10 @@
             if(s && s.is_active) {
                 const t = new Date().toISOString().split('T')[0];
                 const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
-                if(su.length > 0) { box.innerText = "JATAH HABIS"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
+                if(su.length > 0) { box.innerText = "SAYANG SEKALI JATAH MAKAN ANDA HARI INI SUDAH HABIS"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
                 else {
                     await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi }]);
-                    box.innerText = "BERHASIL: " + s.nama; box.className = "p-4 rounded-xl bg-green-100 text-green-700 mb-4 font-bold";
+                    box.innerText = "BERHASIL SILAHKAN MAKAN KAKA: " + s.nama; box.className = "p-4 rounded-xl bg-green-100 text-green-700 mb-4 font-bold";
                 }
             } else { box.innerText = "ID TIDAK AKTIF"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
             input.value = ''; setTimeout(() => box.classList.add('hidden'), 3000);
@@ -417,3 +417,4 @@
     </script>
 </body>
 </html>
+
