@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - Professional System</title>
+    <title>Kanti Delta Spa - ERP System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .admin-subpage { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900">
@@ -21,19 +24,19 @@
         </nav>
 
         <main class="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-white to-slate-100">
-            <div class="max-w-md w-full bg-white p-6 rounded-[2.5rem] shadow-2xl border border-slate-100">
+            <div class="max-w-md w-full bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100">
                 <div id="reader" class="overflow-hidden rounded-[1.5rem] bg-black aspect-square shadow-inner border-4 border-slate-50"></div>
                 <div id="status-msg" class="hidden mt-6 p-4 rounded-2xl text-center font-bold text-sm transition-all duration-500"></div>
                 
                 <div class="relative flex py-6 items-center text-slate-300">
                     <div class="flex-grow border-t border-slate-200"></div>
-                    <span class="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-[0.2em]">Manual Input</span>
+                    <span class="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-[0.2em]">Scan ID atau Input NIK</span>
                     <div class="flex-grow border-t border-slate-200"></div>
                 </div>
 
                 <div class="space-y-3">
-                    <input type="text" id="nik-input" placeholder="Masukkan NIK Staff" 
-                        class="w-full p-4 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none text-center text-xl font-semibold tracking-wider transition-all">
+                    <input type="text" id="nik-input" placeholder="NIK Staff" 
+                        class="w-full p-4 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none text-center text-xl font-semibold tracking-wider transition-all uppercase">
                     <button onclick="prosesKlaim()" 
                         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 text-lg">
                         KLAIM JATAH MAKAN
@@ -43,7 +46,7 @@
         </main>
     </div>
 
-    <div id="page-admin" class="hidden min-h-screen bg-slate-50 flex">
+    <div id="page-admin" class="hidden min-h-screen bg-slate-50 flex overflow-hidden">
         
         <aside class="w-72 bg-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl">
             <div class="p-8">
@@ -51,7 +54,7 @@
                     <span class="text-2xl">🌿</span>
                 </div>
                 <h2 class="text-xl font-bold">Kanti Delta</h2>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Management v2.0</p>
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Management v2.5</p>
             </div>
             
             <nav class="flex-1 px-4 space-y-1">
@@ -76,56 +79,65 @@
                 
                 <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 mb-10">
                     <h3 class="font-bold mb-6 text-slate-700 flex items-center">
-                        <span class="bg-blue-50 text-blue-600 p-2 rounded-lg mr-2 text-sm">➕</span> Data Staff Baru
+                        <span class="bg-blue-50 text-blue-600 p-2 rounded-lg mr-2 text-sm">➕</span> Registrasi Staff & Penempatan
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nama Staff</label>
-                            <input type="text" id="add-nama" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-50 transition">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-wider">Nama Lengkap</label>
+                            <input type="text" id="add-nama" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-50 transition placeholder:text-slate-300" placeholder="Contoh: Putu Wijaya">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">NIK (ID)</label>
-                            <input type="text" id="add-nik" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-50 transition">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-wider">NIK / ID Card</label>
+                            <input type="text" id="add-nik" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-50 transition placeholder:text-slate-300" placeholder="Contoh: KDS001">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Divisi</label>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-wider">Divisi</label>
                             <select id="add-divisi" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-50 transition bg-white">
-                                <option value="Terapis">Terapis</option>
-                                <option value="Front Office">Front Office</option>
-                                <option value="Housekeeping">Housekeeping</option>
-                                <option value="Management">Management</option>
+                                <option value="Operasional">Operasional</option>
+                                <option value="Back Office">Back Office</option>
+                                <option value="General Affair">General Affair</option>
                                 <option value="Security">Security</option>
                             </select>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Jatah Makan</label>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-wider">Departemen</label>
+                            <input type="text" id="add-dept" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-50 transition placeholder:text-slate-300" placeholder="Contoh: Terapis / Front Office">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-wider">Jatah Makan (Per Hari)</label>
                             <input type="number" id="add-jatah" value="1" class="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-50 transition">
                         </div>
                     </div>
-                    <button onclick="simpanStaff()" class="mt-8 bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition shadow-lg shadow-slate-200">Simpan Staff</button>
+                    <button onclick="simpanStaff()" class="mt-8 bg-slate-900 text-white px-10 py-3.5 rounded-xl font-bold hover:bg-black transition shadow-lg shadow-slate-200 flex items-center gap-2">
+                        Simpan Data Staff
+                    </button>
                 </div>
 
                 <div class="bg-white rounded-[1.5rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b border-slate-200">
-                            <tr>
-                                <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest">Nama Staff</th>
-                                <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest">NIK</th>
-                                <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest">Divisi</th>
-                                <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest text-center">Jatah</th>
-                                <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="staff-table-body" class="divide-y divide-slate-100">
-                            </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest">Nama Staff</th>
+                                    <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest">NIK</th>
+                                    <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest text-center">Divisi / Dept</th>
+                                    <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest text-center">Jatah</th>
+                                    <th class="p-5 font-bold text-slate-500 text-[10px] uppercase tracking-widest text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staff-table-body" class="divide-y divide-slate-100">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <section id="sub-laporan" class="admin-subpage hidden">
                 <div class="flex justify-between items-end mb-10">
                     <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Laporan Makan</h2>
-                    <button onclick="muatLaporan()" class="bg-white border p-3 rounded-xl text-xs font-bold shadow-sm hover:bg-slate-50 transition">↻ REFRESH DATA</button>
+                    <button onclick="muatLaporan()" class="bg-white border p-3 rounded-xl text-xs font-bold shadow-sm hover:bg-slate-50 transition flex items-center gap-2">
+                        <span>↻</span> REFRESH DATA
+                    </button>
                 </div>
                 <div id="log-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
@@ -134,15 +146,16 @@
 
     <script>
         // --- KONFIGURASI SUPABASE ---
-        const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        // Ganti dengan kredensial milik Anda
+       const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
-        // Navigasi Utama & Password
+        // --- SISTEM NAVIGASI ---
         function showPage(p) {
             if (p === 'admin') {
-                const pass = prompt("🔐 Masukkan Password Admin:");
+                const pass = prompt("🔐 Akses Admin Terkunci. Masukkan Password:");
                 if (pass !== "kanti123") return alert("Password Salah!");
                 document.getElementById('page-admin').style.display = 'flex';
                 document.getElementById('page-scan').classList.add('hidden');
@@ -153,7 +166,6 @@
             }
         }
 
-        // Navigasi Sidebar
         function switchAdminSubPage(sub) {
             document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
             document.getElementById('sub-' + sub).classList.remove('hidden');
@@ -161,24 +173,26 @@
             if(sub === 'laporan') muatLaporan();
         }
 
-        // --- MANAJEMEN STAFF ---
+        // --- MANAJEMEN DATA STAFF ---
         async function simpanStaff() {
             const nama = document.getElementById('add-nama').value;
             const nik = document.getElementById('add-nik').value;
             const divisi = document.getElementById('add-divisi').value;
+            const dept = document.getElementById('add-dept').value;
             const jatah = document.getElementById('add-jatah').value;
 
-            if(!nama || !nik) return alert("Nama dan NIK wajib diisi!");
+            if(!nama || !nik) return alert("Nama dan NIK tidak boleh kosong!");
 
             const { error } = await _supabase.from('staff').insert([
-                { nik: nik, nama: nama, divisi: divisi, jatah_makan: jatah }
+                { nik: nik, nama: nama, divisi: divisi, departement: dept, jatah_makan: jatah }
             ]);
 
-            if (error) alert("Error: " + error.message);
+            if (error) alert("Gagal Simpan: " + error.message);
             else {
-                alert("Staff " + nama + " ditambahkan!");
+                alert("Berhasil! Data " + nama + " telah disimpan.");
                 document.getElementById('add-nama').value = '';
                 document.getElementById('add-nik').value = '';
+                document.getElementById('add-dept').value = '';
                 muatStaff();
             }
         }
@@ -186,37 +200,41 @@
         async function muatStaff() {
             const tbody = document.getElementById('staff-table-body');
             const { data } = await _supabase.from('staff').select('*').order('nama');
+            
             tbody.innerHTML = data.map(s => `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="p-5">
-                        <div class="font-bold text-slate-800">${s.nama}</div>
-                    </td>
+                <tr class="hover:bg-slate-50 transition group">
+                    <td class="p-5 font-bold text-slate-800">${s.nama}</td>
                     <td class="p-5 font-mono text-xs text-slate-500">${s.nik}</td>
-                    <td class="p-5">
-                        <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase">${s.divisi || '-'}</span>
+                    <td class="p-5 text-center">
+                        <div class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md inline-block uppercase">${s.divisi || '-'}</div>
+                        <div class="text-[9px] text-slate-400 font-medium mt-0.5">${s.departement || 'Unset Dept'}</div>
                     </td>
                     <td class="p-5 text-center font-bold text-slate-700">${s.jatah_makan || 1}x</td>
                     <td class="p-5 text-right">
-                        <button onclick="hapusStaff('${s.nik}')" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase tracking-tighter">Hapus</button>
+                        <button onclick="hapusStaff('${s.nik}')" class="text-slate-300 hover:text-red-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
                     </td>
                 </tr>
             `).join('');
         }
 
         async function hapusStaff(nik) {
-            if(confirm("Hapus staff?")) {
+            if(confirm("Hapus data staff ini secara permanen?")) {
                 await _supabase.from('staff').delete().eq('nik', nik);
                 muatStaff();
             }
         }
 
-        // --- PROSES KLAIM ---
+        // --- LOGIKA KLAIM MAKAN ---
         async function prosesKlaim() {
-            const nik = document.getElementById('nik-input').value;
+            const nikInput = document.getElementById('nik-input').value.trim();
             const statusBox = document.getElementById('status-msg');
-            if(!nik) return;
+            if(!nikInput) return;
 
-            const { data: staff } = await _supabase.from('staff').select('*').eq('nik', nik).single();
+            const { data: staff } = await _supabase.from('staff').select('*').eq('nik', nikInput).single();
             statusBox.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-800');
 
             if (staff) {
@@ -224,51 +242,57 @@
                 const { data: sudahMakan } = await _supabase
                     .from('laporan_makan')
                     .select('*')
-                    .eq('nik_staff', nik)
+                    .eq('nik_staff', staff.nik)
                     .gte('waktu', `${hariIni}T00:00:00Z`)
                     .lte('waktu', `${hariIni}T23:59:59Z`);
 
-                // Logika: Jika jumlah klaim >= jatah makan staff tersebut
                 if (sudahMakan && sudahMakan.length >= (staff.jatah_makan || 1)) {
-                    statusBox.innerHTML = `⚠️ JATAH HABIS: ${staff.nama} sudah makan ${sudahMakan.length}x hari ini!`;
+                    statusBox.innerHTML = `⚠️ JATAH MAKAN HABIS<br><span class="text-xs font-normal">${staff.nama} sudah makan ${sudahMakan.length}x hari ini.</span>`;
                     statusBox.className = "mt-6 p-5 rounded-2xl text-center font-bold bg-yellow-100 text-yellow-800 border border-yellow-200";
                 } else {
-                    await _supabase.from('laporan_makan').insert([{ nik_staff: nik, nama_staff: staff.nama }]);
-                    statusBox.innerHTML = `✅ BERHASIL! Selamat makan, ${staff.nama} (${staff.divisi})`;
+                    await _supabase.from('laporan_makan').insert([{ nik_staff: staff.nik, nama_staff: staff.nama }]);
+                    statusBox.innerHTML = `✅ KLAIM BERHASIL<br><span class="text-xs font-normal">Selamat makan, ${staff.nama} (${staff.departement || staff.divisi})</span>`;
                     statusBox.className = "mt-6 p-5 rounded-2xl text-center font-bold bg-green-100 text-green-700 border border-green-200";
                 }
                 document.getElementById('nik-input').value = '';
             } else {
-                statusBox.innerHTML = "❌ NIK TIDAK TERDAFTAR!";
+                statusBox.innerHTML = `❌ NIK TIDAK DITEMUKAN<br><span class="text-xs font-normal text-red-500">Pastikan ID sudah terdaftar di database Admin.</span>`;
                 statusBox.className = "mt-6 p-5 rounded-2xl text-center font-bold bg-red-100 text-red-700 border border-red-200";
             }
             statusBox.classList.remove('hidden');
             setTimeout(() => statusBox.classList.add('hidden'), 5000);
         }
 
-        // --- LAPORAN ---
+        // --- MANAJEMEN LAPORAN ---
         async function muatLaporan() {
             const list = document.getElementById('log-list');
             const { data } = await _supabase.from('laporan_makan').select('*').order('waktu', { ascending: false });
+            
+            if(!data || data.length === 0) {
+                list.innerHTML = '<p class="col-span-full text-center py-20 text-slate-300 italic">Belum ada data klaim hari ini.</p>';
+                return;
+            }
+
             list.innerHTML = data.map(l => `
-                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center group hover:shadow-md transition">
                     <div>
                         <p class="font-bold text-slate-800">${l.nama_staff}</p>
-                        <p class="text-[9px] text-slate-400 font-bold tracking-widest mt-1">NIK: ${l.nik_staff}</p>
+                        <p class="text-[9px] text-slate-400 font-bold tracking-widest mt-1 uppercase">NIK: ${l.nik_staff}</p>
                     </div>
-                    <div class="text-right">
-                        <div class="text-[11px] font-bold text-slate-700 bg-slate-50 px-2 py-1 rounded-lg">${new Date(l.waktu).toLocaleTimeString()}</div>
+                    <div class="text-right flex flex-col items-end">
+                        <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">${new Date(l.waktu).toLocaleTimeString()}</span>
+                        <span class="text-[8px] text-slate-300 mt-1 uppercase">${new Date(l.waktu).toLocaleDateString('id-ID', {day:'2-digit', month:'short'})}</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        // --- QR SCANNER ---
+        // --- QR SCANNER INIT ---
         const scanner = new Html5Qrcode("reader");
-        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+        scanner.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, (text) => {
             document.getElementById('nik-input').value = text;
             prosesKlaim();
-        }).catch(err => console.log("Kamera OFF"));
+        }).catch(() => console.log("Menunggu izin kamera..."));
 
     </script>
 </body>
