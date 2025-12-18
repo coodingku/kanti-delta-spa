@@ -95,6 +95,16 @@
             </nav>
         </aside>
 
+<div class="px-4 py-4 mt-4 border-t border-slate-800">
+    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Kontrol Fitur</p>
+    <button id="btn-toggle-regis" onclick="toggleRegisStatus()" class="w-full text-left p-3 rounded-xl transition font-bold text-xs flex justify-between items-center bg-slate-800">
+        <span>Daftar Mandiri</span>
+        <span id="regis-status-label" class="text-green-400">AKTIF</span>
+    </button>
+</div>
+
+
+        
         <main class="flex-1 p-8 overflow-y-auto custom-scroll">
             
             <section id="sub-staff" class="admin-subpage hidden">
@@ -399,6 +409,56 @@
             sinkronisasiMenu();
         }
 
+// --- KONTROL TOMBOL DAFTAR MANDIRI ---
+
+// 1. Fungsi untuk mengecek status saat halaman dimuat
+function cekStatusRegistrasi() {
+    const isLocked = localStorage.getItem('regis_locked') === 'true';
+    const btnDaftarHalamanDepan = document.querySelector('button[onclick="openRegisModal()"]');
+    const labelStatusSidebar = document.getElementById('regis-status-label');
+    const btnSidebar = document.getElementById('btn-toggle-regis');
+
+    if (isLocked) {
+        // Jika dikunci
+        if (btnDaftarHalamanDepan) btnDaftarHalamanDepan.classList.add('hidden');
+        if (labelStatusSidebar) {
+            labelStatusSidebar.innerText = 'NON-AKTIF';
+            labelStatusSidebar.className = 'text-red-500';
+        }
+    } else {
+        // Jika aktif
+        if (btnDaftarHalamanDepan) btnDaftarHalamanDepan.classList.remove('hidden');
+        if (labelStatusSidebar) {
+            labelStatusSidebar.innerText = 'AKTIF';
+            labelStatusSidebar.className = 'text-green-400';
+        }
+    }
+}
+
+// 2. Fungsi untuk mengubah status (ON/OFF)
+function toggleRegisStatus() {
+    const isLocked = localStorage.getItem('regis_locked') === 'true';
+    
+    if (!isLocked) {
+        if (confirm("Matikan fitur pendaftaran mandiri untuk staff?")) {
+            localStorage.setItem('regis_locked', 'true');
+        }
+    } else {
+        if (confirm("Aktifkan kembali pendaftaran mandiri?")) {
+            localStorage.setItem('regis_locked', 'false');
+        }
+    }
+    
+    cekStatusRegistrasi(); // Update tampilan seketika
+}
+
+// 3. Panggil fungsi cekStatus setiap kali halaman dibuka/pindah page
+// Tambahkan baris ini di dalam fungsi showPage(p) Anda:
+// if(p === 'scan') cekStatusRegistrasi();
+
+
+
+        
         async function prosesKlaim() {
             const input = document.getElementById('nik-input');
             const nik = input.value.trim().toUpperCase();
@@ -426,10 +486,14 @@
         function openRegisModal() { muatDivisiKeDropdown('reg-divisi'); document.getElementById('modal-regis').classList.remove('hidden'); }
         function closeRegisModal() { document.getElementById('modal-regis').classList.add('hidden'); }
 
+        // Jalankan pengecekan saat startup
+        cekStatusRegistrasi();
+
         setInterval(updateClock, 1000); updateClock(); sinkronisasiMenu();
         document.getElementById('nik-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') prosesKlaim(); });
     </script>
 </body>
 </html>
+
 
 
