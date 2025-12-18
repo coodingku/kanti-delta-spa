@@ -547,24 +547,16 @@
         }
 
         // --- SCAN PROCESS ---
-   async function prosesKlaim() {
+  async function prosesKlaim() {
     const input = document.getElementById('nik-input');
     const nik = input.value.trim().toUpperCase();
     const box = document.getElementById('status-msg');
     if(!nik) return;
 
-    // 1. Dapatkan Tanggal Lokal Hari Ini (Format: YYYY-MM-DD)
-    const n = new Date();
-    const y = n.getFullYear();
-    const m = String(n.getMonth() + 1).padStart(2, '0');
-    const d = String(n.getDate()).padStart(2, '0');
-    const tglLokal = `${y}-${m}-${d}`;
-
-    // Tampilkan loading sebentar agar user tidak klik berkali-kali
     input.disabled = true;
 
-    // 2. Cari data staff
-    const { data: s, error: errStaff } = await _supabase
+    // 1. Validasi Staff
+    const { data: s } = await _supabase
         .from('staff')
         .select('*')
         .eq('nik', nik)
@@ -573,52 +565,35 @@
     box.classList.remove('hidden', 'bg-emerald-50', 'bg-rose-50', 'text-emerald-700', 'text-rose-700');
 
     if(s && s.is_active) {
-        // 3. CEK RIWAYAT: Apakah NIK ini sudah ada di tabel laporan_makan pada tanggal hari ini?
-        // Kita gunakan filter gte (>=) jam 00:00 dan lte (<=) jam 23:59
-        const { data: su, error: errCek } = await _supabase
+        // 2. Coba Insert
+        const { error: errInsert } = await _supabase
             .from('laporan_makan')
-            .select('id')
-            .eq('nik_staff', s.nik)
-            .gte('waktu', `${tglLokal}T00:00:00`)
-            .lte('waktu', `${tglLokal}T23:59:59`);
+            .insert([{ 
+                nik_staff: s.nik, 
+                nama_staff: s.nama, 
+                divisi: s.divisi 
+            }]);
 
-        if(su && su.length > 0) { 
-            // JIKA SUDAH ADA DATA
-            box.innerText = "GAGAL: ID " + s.nik + " SUDAH SCAN HARI INI"; 
-            box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center text-[10px]"; 
+        if(!errInsert) {
+            box.innerText = "✅ BERHASIL: " + s.nama; 
+            box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold border border-emerald-100 text-center";
+        } else if (errInsert.code === '23505') {
+            // Kode 23505 adalah Unique Violation (Sudah ada di database)
+            box.innerText = "❌ GAGAL: ANDA SUDAH SCAN HARI INI"; 
+            box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center"; 
         } else {
-            // JIKA BELUM ADA, MASUKKAN DATA BARU
-            const { error: errInsert } = await _supabase
-                .from('laporan_makan')
-                .insert([{ 
-                    nik_staff: s.nik, 
-                    nama_staff: s.nama, 
-                    divisi: s.divisi 
-                    // Kolom 'waktu' akan terisi otomatis oleh database (now())
-                }]);
-
-            if(!errInsert) {
-                box.innerText = "BERHASIL: " + s.nama + " (SILAHKAN MAKAN)"; 
-                box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold border border-emerald-100 text-center text-[10px]";
-            } else {
-                box.innerText = "ERROR SISTEM: " + errInsert.message;
-                box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center";
-            }
+            box.innerText = "⚠️ GANGGUAN SISTEM";
+            console.error(errInsert);
         }
     } else { 
-        box.innerText = "ID SALAH ATAU STAFF NON-AKTIF"; 
+        box.innerText = "❌ ID TIDAK DITEMUKAN / NON-AKTIF"; 
         box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center"; 
     }
 
-    // Reset Input
     input.disabled = false;
     input.value = ''; 
     input.focus();
-    
-    // Hilangkan pesan setelah 4 detik
-    setTimeout(() => {
-        box.classList.add('hidden');
-    }, 4000);
+    setTimeout(() => box.classList.add('hidden'), 4000);
 }
         // --- EDIT STAFF MODAL ---
         async function openEditModal(nik, nama, divisi, status) {
@@ -657,6 +632,7 @@
     </script>
 </body>
 </html>
+
 
 
 
