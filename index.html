@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kantin Delta Spa - ERP v10.9</title>
+    <title>Kantin Delta Spa - ERP v11.2 Ultimate</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -17,10 +17,15 @@
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         .active-nav { background: #1e293b; border-left: 4px solid #fbbf24; color: #fbbf24 !important; }
+
         @media print {
             body * { visibility: hidden; }
             #struk-print, #struk-print * { visibility: visible; }
-            #struk-print { position: absolute; left: 0; top: 0; width: 50mm; padding: 2mm; font-family: 'Courier New', Courier, monospace; color: black; background: white; }
+            #struk-print { 
+                position: absolute; left: 0; top: 0; width: 50mm; 
+                padding: 2mm; font-family: 'Courier New', Courier, monospace;
+                color: black; background: white;
+            }
             @page { size: auto; margin: 0; }
         }
     </style>
@@ -32,16 +37,16 @@
             <h3 class="text-lg font-black mb-4 uppercase text-slate-800">✏️ Edit Data Staff</h3>
             <div class="space-y-3">
                 <input type="hidden" id="edit-old-nik">
-                <div>
+                <div class="space-y-1">
                     <label class="text-[9px] font-bold text-slate-400 uppercase">Nama Lengkap</label>
                     <input type="text" id="edit-nama" class="w-full p-3 border rounded-xl font-bold uppercase outline-none focus:border-blue-500">
                 </div>
-                <div>
+                <div class="space-y-1">
                     <label class="text-[9px] font-bold text-slate-400 uppercase">Divisi</label>
                     <select id="edit-divisi" class="w-full p-3 border rounded-xl font-bold bg-white"></select>
                 </div>
-                <div>
-                    <label class="text-[9px] font-bold text-slate-400 uppercase">Status</label>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase">Status Keaktifan</label>
                     <select id="edit-status" class="w-full p-3 border rounded-xl font-bold bg-white">
                         <option value="true">✅ AKTIF</option>
                         <option value="false">🚫 NON-AKTIF</option>
@@ -62,7 +67,7 @@
             <div class="space-y-4 text-left">
                 <div>
                     <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Nama Lengkap</label>
-                    <input type="text" id="reg-nama" class="w-full p-4 border rounded-2xl uppercase font-bold outline-none focus:border-blue-500" placeholder="NAMA LENGKAP">
+                    <input type="text" id="reg-nama" class="w-full p-4 border rounded-2xl uppercase font-bold outline-none focus:border-blue-500" placeholder="CONTOH: BUDI SANTOSO">
                 </div>
                 <div>
                     <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Divisi Kerja</label>
@@ -87,14 +92,19 @@
                 <div id="clock" class="digital-clock text-6xl font-black text-slate-800">00:00:00</div>
                 <div id="date-display" class="text-[10px] font-black text-blue-500 uppercase mt-2 tracking-widest">...</div>
             </div>
-            <div class="bg-amber-50 border border-amber-100 p-4 rounded-[2rem] w-full max-w-xs text-center">
-                <p id="display-menu-hari-ini" class="text-base font-black text-slate-800 uppercase italic">MEMUAT MENU...</p>
+
+            <div class="bg-amber-50 border border-amber-100 p-6 rounded-[2rem] w-full max-w-xs text-center shadow-sm">
+                <p id="display-menu-hari-ini" class="text-base font-black text-slate-800 uppercase italic">MENGHUBUNGKAN SERVER...</p>
+                <p id="error-db-msg" class="hidden text-red-500 font-bold mt-2 text-[8px] uppercase">Gagal memuat data. Periksa koneksi.</p>
             </div>
+
             <div id="scan-container" class="hidden max-w-xs w-full bg-white p-8 rounded-[3rem] shadow-2xl border text-center">
                 <div id="status-msg" class="hidden p-3 rounded-xl font-bold text-[11px] mb-4 border"></div>
-                <input type="text" id="nik-input" autofocus placeholder="ID STAFF" class="w-full p-4 border-2 border-slate-100 rounded-2xl text-center text-3xl font-black uppercase mb-4 outline-none focus:border-blue-500">
-                <button onclick="prosesKlaim()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg uppercase tracking-widest mb-6">KLAIM MAKAN</button>
-                <div id="area-daftar-mandiri"><button onclick="openRegisModal('mandiri')" class="text-blue-600 font-bold text-[10px] uppercase hover:underline">Daftar ID Baru</button></div>
+                <input type="text" id="nik-input" autofocus placeholder="ID STAFF" class="w-full p-4 border-2 border-slate-100 rounded-2xl text-center text-3xl font-black uppercase focus:border-blue-500 mb-4 outline-none">
+                <button onclick="prosesKlaim()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 uppercase tracking-widest mb-6">KLAIM MAKAN</button>
+                <div id="area-daftar-mandiri">
+                    <button onclick="openRegisModal('mandiri')" class="text-blue-600 font-bold text-[10px] uppercase hover:underline">Daftar ID Baru</button>
+                </div>
             </div>
         </main>
     </div>
@@ -108,18 +118,20 @@
             <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scroll">
                 <button id="nav-dashboard" onclick="switchAdminSubPage('dashboard')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-slate-400 uppercase">📊 Dashboard</button>
                 <button id="nav-staff" onclick="switchAdminSubPage('staff')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-slate-400 uppercase">👥 Data Staff</button>
-                <button id="nav-master-divisi" onclick="switchAdminSubPage('master-divisi')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-emerald-400 uppercase">🏢 Divisi</button>
-                <button id="nav-menu-makan" onclick="switchAdminSubPage('menu-makan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-orange-400 uppercase">🍱 Menu</button>
-                <button id="nav-laporan-scan" onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-emerald-400 uppercase">📜 Laporan</button>
-                <button id="nav-laporan-detail" onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-blue-400 uppercase">💰 Rekap</button>
+                <button id="nav-master-divisi" onclick="switchAdminSubPage('master-divisi')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-emerald-400 uppercase">🏢 Master Divisi</button>
+                <button id="nav-menu-makan" onclick="switchAdminSubPage('menu-makan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-orange-400 uppercase">🍱 Menu Makan</button>
+                <button id="nav-laporan-scan" onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-emerald-400 uppercase">📜 Laporan Scan</button>
+                <button id="nav-laporan-detail" onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-blue-400 uppercase">💰 Rekap Biaya</button>
             </nav>
-            <div class="p-4 border-t border-slate-800"><button onclick="showPage('scan')" class="w-full p-3 bg-red-600 text-white rounded-xl font-black uppercase text-[10px]">Logout</button></div>
+            <div class="p-4 border-t border-slate-800">
+                <button onclick="showPage('scan')" class="w-full p-3 bg-red-600 text-white rounded-xl font-black uppercase text-[10px]">Logout Admin</button>
+            </div>
         </aside>
 
         <main class="flex-1 overflow-y-auto p-8 custom-scroll">
             <section id="sub-dashboard" class="admin-subpage hidden">
                 <h2 class="text-2xl font-black uppercase mb-8 italic text-slate-800">Dashboard</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-3xl border shadow-sm">
                         <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Total Scan Hari Ini</p>
                         <h3 id="stat-total-scan" class="text-4xl font-black text-blue-600 italic">0</h3>
@@ -133,41 +145,19 @@
 
             <section id="sub-staff" class="admin-subpage hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-black uppercase italic text-slate-800">Data Staff</h2>
+                    <h2 class="text-2xl font-black uppercase italic text-slate-800">Database Staff</h2>
                     <button onclick="openRegisModal('admin')" class="bg-blue-600 text-white px-5 py-2 rounded-xl font-black text-[9px] uppercase shadow-lg">+ Tambah Staff</button>
                 </div>
-                <div class="bg-white p-4 rounded-3xl border mb-6 flex gap-4">
-                    <input type="text" id="cari-staff" onkeyup="filterTabelStaff()" placeholder="Cari Nama/NIK..." class="flex-1 p-3 bg-slate-50 border rounded-xl font-bold text-[11px] outline-none">
+                <div class="bg-white p-4 rounded-3xl border mb-6 flex gap-4 shadow-sm">
+                    <input type="text" id="cari-staff" onkeyup="filterTabelStaff()" placeholder="Cari Nama atau NIK..." class="flex-1 p-3 bg-slate-50 border rounded-xl font-bold text-[11px] outline-none">
                     <select id="filter-divisi-staff" onchange="filterTabelStaff()" class="w-56 p-3 bg-slate-50 border rounded-xl font-bold text-[11px] outline-none"></select>
                 </div>
                 <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
                     <table class="w-full text-left text-[11px]" id="tabel-staff">
                         <thead class="bg-slate-50 border-b text-slate-400 font-black uppercase">
-                            <tr><th class="p-5">NIK</th><th class="p-5">NAMA</th><th class="p-5">DIVISI</th><th class="p-5">STATUS</th><th class="p-5 text-center">AKSI</th></tr>
+                            <tr><th class="p-5">NIK ID</th><th class="p-5">NAMA STAFF</th><th class="p-5">DIVISI</th><th class="p-5">STATUS</th><th class="p-5 text-center">TINDAKAN</th></tr>
                         </thead>
                         <tbody id="staff-table-body" class="divide-y"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section id="sub-laporan-scan" class="admin-subpage hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-black uppercase italic text-emerald-600">Laporan Harian</h2>
-                    <button onclick="cetakPDF('harian')" class="bg-emerald-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">Cetak PDF</button>
-                </div>
-                <div class="bg-white p-5 rounded-3xl border grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 items-end">
-                    <div>
-                        <label class="text-[9px] font-bold text-slate-400 uppercase">Pilih Tanggal</label>
-                        <input type="date" id="filter-tgl-harian" class="w-full p-3 border rounded-xl font-bold text-[11px] bg-slate-50">
-                    </div>
-                    <button onclick="muatLaporanHarian()" class="bg-slate-900 text-white py-3.5 rounded-xl font-black uppercase text-[10px] shadow-lg">Tampilkan Data</button>
-                </div>
-                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
-                    <table class="w-full text-left text-[11px]" id="tabel-laporan-harian">
-                        <thead class="bg-slate-50 border-b font-black text-slate-400 uppercase">
-                            <tr><th class="p-5">WAKTU</th><th class="p-5 text-center">NIK</th><th class="p-5">NAMA STAFF</th><th class="p-5">DIVISI</th><th class="p-5 text-center">AKSI</th></tr>
-                        </thead>
-                        <tbody id="harian-table-body" class="divide-y"></tbody>
                     </table>
                 </div>
             </section>
@@ -199,23 +189,45 @@
                     </div>
                     <div class="space-y-1">
                         <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Harga per Porsi (IDR)</label>
-                        <input type="number" id="input-harga-menu" class="w-full p-4 border rounded-2xl font-black text-sm outline-none bg-slate-50 focus:border-orange-500" placeholder="15000">
+                        <input type="number" id="input-harga-menu" class="w-full p-4 border rounded-2xl font-black text-sm outline-none bg-slate-50 focus:border-orange-500" value="15000">
                     </div>
                     <button onclick="simpanMenu()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black uppercase shadow-lg active:scale-95 transition-all">Aktifkan Menu Sekarang</button>
                 </div>
             </section>
 
+            <section id="sub-laporan-scan" class="admin-subpage hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black uppercase italic text-emerald-600">Laporan Scan Harian</h2>
+                    <button onclick="cetakPDF('harian')" class="bg-emerald-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">Cetak PDF</button>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 items-end shadow-sm">
+                    <div>
+                        <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Pilih Tanggal</label>
+                        <input type="date" id="filter-tgl-harian" class="w-full p-3 border rounded-xl font-bold text-[11px] bg-slate-50 outline-none">
+                    </div>
+                    <button onclick="muatLaporanHarian()" class="bg-slate-900 text-white py-3.5 rounded-xl font-black uppercase text-[10px] shadow-lg active:scale-95 transition-all">Filter & Tampilkan</button>
+                </div>
+                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-[11px]" id="tabel-laporan-harian">
+                        <thead class="bg-slate-50 border-b font-black text-slate-400 uppercase">
+                            <tr><th class="p-5">WAKTU</th><th class="p-5 text-center">NIK</th><th class="p-5">NAMA STAFF</th><th class="p-5">DIVISI</th><th class="p-5 text-center">AKSI</th></tr>
+                        </thead>
+                        <tbody id="harian-table-body" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </section>
+
             <section id="sub-laporan-detail" class="admin-subpage hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-black uppercase italic text-blue-600">Rekap Biaya</h2>
+                    <h2 class="text-2xl font-black uppercase italic text-blue-600">Rekap Biaya Bulanan</h2>
                     <button onclick="cetakPDF('bulanan')" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">Cetak Rekap</button>
                 </div>
-                <div class="bg-white p-5 rounded-3xl border grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 items-end">
+                <div class="bg-white p-5 rounded-3xl border grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 items-end shadow-sm">
                     <div>
-                        <label class="text-[9px] font-bold text-slate-400 uppercase">Pilih Bulan</label>
+                        <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Pilih Bulan</label>
                         <input type="month" id="rekap-bulan" class="w-full p-3 border rounded-xl font-bold text-[11px] bg-slate-50">
                     </div>
-                    <button onclick="muatRekapBulanan()" class="bg-blue-600 text-white py-3.5 rounded-xl font-black uppercase text-[10px] shadow-lg">Hitung Rekap</button>
+                    <button onclick="muatRekapBulanan()" class="bg-blue-600 text-white py-3.5 rounded-xl font-black uppercase text-[10px] shadow-lg active:scale-95 transition-all">Hitung Total</button>
                 </div>
                 <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
                     <table class="w-full text-left text-[11px]" id="tabel-rekap-bulanan">
@@ -231,29 +243,32 @@
 
     <div id="struk-print" class="hidden text-black text-center">
         <div style="border-bottom: 1px dashed #000; padding-bottom: 5px;">
-            <h2 style="font-size: 12px; margin: 0; font-weight: bold;">KANTIN DELTA SPA</h2>
+            <h2 style="font-size: 14px; margin: 0; font-weight: bold;">KANTIN DELTA SPA</h2>
             <p style="font-size: 8px; margin: 0;">BUKTI KLAIM MAKAN</p>
         </div>
-        <div style="font-size: 9px; padding: 5px 0; text-align: left;">
-            <p>Tgl: <span id="p-tgl"></span> <span id="p-jam"></span></p>
+        <div style="font-size: 10px; padding: 10px 0; text-align: left;">
+            <p>Tgl : <span id="p-tgl"></span></p>
+            <p>Jam : <span id="p-jam"></span></p>
             <p>Nama: <span id="p-nama" style="font-weight: bold;"></span></p>
-            <p>Div: <span id="p-divisi"></span></p>
+            <p>Div : <span id="p-divisi"></span></p>
         </div>
     </div>
 
     <script>
         // --- KONFIGURASI SUPABASE ---
-        const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        // MASUKKAN URL DAN ANON KEY ANDA DISINI
+       const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
-        // --- NAVIGATION & UI ---
+        // --- NAVIGATION ---
         function showPage(p) {
             if(p === 'admin') {
                 const pass = prompt("Password Admin:");
-                if(pass !== "kantin123") return;
+                if(pass !== "kantin123") return; 
                 document.getElementById('page-admin').classList.remove('hidden');
                 document.getElementById('page-scan').classList.add('hidden');
                 switchAdminSubPage('dashboard');
@@ -285,9 +300,82 @@
             }
         }
 
-        // --- CORE FUNCTIONS ---
+        // --- CORE: KLAIM MAKAN ---
+        async function prosesKlaim() {
+            const input = document.getElementById('nik-input');
+            const nik = input.value.trim().toUpperCase();
+            if(!nik) return;
+            
+            input.disabled = true;
+            const { data: s } = await _supabase.from('staff').select('*').eq('nik', nik).maybeSingle();
+            const box = document.getElementById('status-msg');
+            box.classList.remove('hidden', 'bg-emerald-50', 'bg-rose-50', 'text-emerald-700', 'text-rose-700');
+            
+            if(s && s.is_active) {
+                const { error } = await _supabase.from('laporan_makan').insert([{ 
+                    nik_staff: s.nik, 
+                    nama_staff: s.nama, 
+                    divisi: s.divisi,
+                    waktu: new Date().toISOString() 
+                }]);
+                if(!error) {
+                    box.innerText = "✅ BERHASIL: " + s.nama;
+                    box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold border border-emerald-100";
+                    document.getElementById('p-tgl').innerText = new Date().toLocaleDateString('id-ID');
+                    document.getElementById('p-jam').innerText = new Date().toLocaleTimeString('id-ID');
+                    document.getElementById('p-nama').innerText = s.nama;
+                    document.getElementById('p-divisi').innerText = s.divisi;
+                    setTimeout(() => window.print(), 500);
+                } else {
+                    box.innerText = "❌ SUDAH SCAN HARI INI";
+                    box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100";
+                }
+            } else {
+                box.innerText = "❌ ID SALAH / NONAKTIF";
+                box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100";
+            }
+            input.disabled = false; input.value = ''; input.focus();
+            setTimeout(() => box.classList.add('hidden'), 3000);
+        }
+
+        // --- SYNC MENU (FIX LOADING) ---
+        async function sinkronisasiMenu() {
+            const menuEl = document.getElementById('display-menu-hari-ini');
+            const scanBox = document.getElementById('scan-container');
+            const errEl = document.getElementById('error-db-msg');
+            const tgl = new Date().toLocaleDateString('en-CA');
+
+            try {
+                const { data, error } = await _supabase.from('menu_harian').select('*').eq('tanggal', tgl).maybeSingle();
+                if(error) throw error;
+
+                if(data) {
+                    menuEl.innerText = data.nama_menu;
+                    scanBox.classList.remove('hidden');
+                    errEl.classList.add('hidden');
+                } else {
+                    menuEl.innerText = "MENU BELUM DI-SET HARI INI";
+                    scanBox.classList.add('hidden');
+                    errEl.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                menuEl.innerText = "KONEKSI BERMASALAH";
+                errEl.classList.remove('hidden');
+            }
+        }
+
+        // --- DASHBOARD ---
+        async function muatDashboard() {
+            const t = new Date().toLocaleDateString('en-CA');
+            const { data: scan } = await _supabase.from('laporan_makan').select('*').ilike('waktu', `%${t}%`);
+            document.getElementById('stat-total-scan').innerText = scan ? scan.length : 0;
+            document.getElementById('stat-total-biaya').innerText = formatIDR((scan ? scan.length : 0) * 15000);
+        }
+
+        // --- DATA STAFF ---
         async function muatStaff() {
-            const { data } = await _sb.from('staff').select('*').order('nama');
+            const { data } = await _supabase.from('staff').select('*').order('nama');
             muatDivisiKeDropdown('filter-divisi-staff', true);
             const body = document.getElementById('staff-table-body');
             body.innerHTML = (data || []).map(s => `
@@ -296,53 +384,31 @@
                     <td class="p-5 uppercase font-black text-slate-800">${s.nama}</td>
                     <td class="p-5 font-semibold text-slate-500">${s.divisi}</td>
                     <td class="p-5"><span class="px-2 py-1 rounded-full text-[9px] font-bold ${s.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}">${s.is_active ? 'AKTIF' : 'OFF'}</span></td>
-                    <td class="p-5 text-center"><button onclick="openEditModal('${s.nik}', '${s.nama}', '${s.divisi}', ${s.is_active})" class="text-[9px] font-bold uppercase border px-3 py-1 rounded-lg">Edit</button></td>
+                    <td class="p-5 text-center"><button onclick="openEditModal('${s.nik}', '${s.nama}', '${s.divisi}', ${s.is_active})" class="bg-white border px-3 py-1 rounded-lg text-[9px] font-bold uppercase hover:bg-slate-900 hover:text-white transition-all">Edit</button></td>
                 </tr>
             `).join('');
         }
 
-        async function prosesKlaim() {
-            const inp = document.getElementById('nik-input');
-            const nik = inp.value.trim().toUpperCase();
-            if(!nik) return;
-            inp.disabled = true;
-
-            const { data: s } = await _sb.from('staff').select('*').eq('nik', nik).maybeSingle();
-            const box = document.getElementById('status-msg');
-            box.classList.remove('hidden');
-
-            if(s && s.is_active) {
-                const { error } = await _sb.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi, waktu: new Date().toISOString() }]);
-                if(!error) {
-                    box.innerText = "✅ BERHASIL: " + s.nama;
-                    box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 font-bold mb-4 border border-emerald-100";
-                    document.getElementById('p-tgl').innerText = new Date().toLocaleDateString('id-ID');
-                    document.getElementById('p-jam').innerText = new Date().toLocaleTimeString('id-ID');
-                    document.getElementById('p-nama').innerText = s.nama;
-                    document.getElementById('p-divisi').innerText = s.divisi;
-                    setTimeout(() => window.print(), 300);
-                } else {
-                    box.innerText = "❌ SUDAH SCAN HARI INI";
-                    box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 font-bold mb-4 border border-rose-100";
-                }
-            } else {
-                box.innerText = "❌ ID SALAH / NONAKTIF";
-                box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 font-bold mb-4 border border-rose-100";
-            }
-            inp.disabled = false; inp.value = ''; inp.focus();
-            setTimeout(() => box.classList.add('hidden'), 3000);
+        function filterTabelStaff() {
+            const keyword = document.getElementById('cari-staff').value.toUpperCase();
+            const div = document.getElementById('filter-divisi-staff').value;
+            const rows = document.querySelectorAll("#staff-table-body tr");
+            rows.forEach(r => {
+                const matchCari = r.cells[0].innerText.includes(keyword) || r.cells[1].innerText.includes(keyword);
+                const matchDiv = (div === 'SEMUA' || r.cells[2].innerText === div);
+                r.style.display = (matchCari && matchDiv) ? "" : "none";
+            });
         }
 
+        // --- LAPORAN HARIAN (ILIKE FIXED) ---
         async function muatLaporanHarian() {
             const t = document.getElementById('filter-tgl-harian').value;
             if(!t) return;
-            // Gunakan pencarian teks sederhana untuk menghindari error 404 pada filter kompleks
-            const { data, error } = await _sb.from('laporan_makan').select('*').ilike('waktu', `%${t}%`).order('waktu', { ascending: false });
-            
+            const { data } = await _supabase.from('laporan_makan').select('*').ilike('waktu', `%${t}%`).order('waktu', { ascending: false });
             const body = document.getElementById('harian-table-body');
             if(data && data.length > 0) {
                 body.innerHTML = data.map(l => `
-                    <tr>
+                    <tr class="hover:bg-slate-50">
                         <td class="p-5 font-bold text-blue-600">${new Date(l.waktu).toLocaleTimeString('id-ID')}</td>
                         <td class="p-5 text-center font-bold text-slate-400">${l.nik_staff}</td>
                         <td class="p-5 font-black uppercase">${l.nama_staff}</td>
@@ -351,68 +417,51 @@
                     </tr>
                 `).join('');
             } else {
-                body.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">TIDAK ADA DATA PADA ${t}</td></tr>`;
+                body.innerHTML = `<tr><td colspan="5" class="p-10 text-center font-bold text-slate-300 uppercase">TIDAK ADA DATA</td></tr>`;
             }
         }
 
-        async function muatDashboard() {
-            const t = new Date().toLocaleDateString('en-CA');
-            const { data: scan } = await _sb.from('laporan_makan').select('*').ilike('waktu', `%${t}%`);
-            document.getElementById('stat-total-scan').innerText = scan ? scan.length : 0;
-            document.getElementById('stat-total-biaya').innerText = formatIDR((scan ? scan.length : 0) * 15000);
-        }
-
-        // --- OTHER UTILS ---
-        async function muatDivisiKeDropdown(id, all = false) {
-            const { data } = await _sb.from('master_divisi').select('nama_divisi').order('nama_divisi');
-            let h = all ? '<option value="SEMUA">SEMUA DIVISI</option>' : '';
-            h += (data || []).map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
-            document.getElementById(id).innerHTML = h;
-        }
-
-        async function sinkronisasiMenu() {
-            const t = new Date().toLocaleDateString('en-CA');
-            const { data } = await _sb.from('menu_harian').select('*').eq('tanggal', t).maybeSingle();
-            if(data) {
-                document.getElementById('display-menu-hari-ini').innerText = data.nama_menu;
-                document.getElementById('scan-container').classList.remove('hidden');
-            } else {
-                document.getElementById('display-menu-hari-ini').innerText = "MENU BELUM DI-SET";
-                document.getElementById('scan-container').classList.add('hidden');
-            }
-        }
-
+        // --- REKAP BIAYA ---
         async function muatRekapBulanan() {
             const bln = document.getElementById('rekap-bulan').value;
             if(!bln) return;
-            const { data: klaims } = await _sb.from('laporan_makan').select('nik_staff').ilike('waktu', `%${bln}%`);
-            const { data: staffs } = await _sb.from('staff').select('*').order('nama');
+            const { data: klaims } = await _supabase.from('laporan_makan').select('nik_staff').ilike('waktu', `%${bln}%`);
+            const { data: staffs } = await _supabase.from('staff').select('*').order('nama');
             document.getElementById('detail-table-body').innerHTML = (staffs || []).map(s => {
                 const tot = (klaims || []).filter(k => k.nik_staff === s.nik).length;
-                return `<tr><td class="p-5 font-black uppercase">${s.nama}</td><td class="p-5 text-center font-bold">${tot} x</td><td class="p-5 text-right font-bold text-blue-600">${formatIDR(tot * 15000)}</td></tr>`;
+                return `<tr><td class="p-5 font-bold uppercase text-slate-800">${s.nama}</td><td class="p-5 text-center font-black">${tot} x</td><td class="p-5 text-right font-bold text-blue-600">${formatIDR(tot * 15000)}</td></tr>`;
             }).join('');
+        }
+
+        // --- MASTER DIVISI & MENU ---
+        async function muatDivisi() {
+            const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
+            document.getElementById('divisi-table-body').innerHTML = (data || []).map(d => `
+                <tr><td class="p-5 font-bold uppercase">${d.nama_divisi}</td><td class="p-5 text-center"><button onclick="hapusDivisi(${d.id})" class="text-rose-500">Hapus</button></td></tr>
+            `).join('');
         }
 
         async function simpanDivisi() {
             const val = document.getElementById('input-divisi').value.toUpperCase().trim();
             if(!val) return;
-            await _sb.from('master_divisi').insert([{ nama_divisi: val }]);
+            await _supabase.from('master_divisi').insert([{ nama_divisi: val }]);
             document.getElementById('input-divisi').value = ''; muatDivisi();
-        }
-
-        async function muatDivisi() {
-            const { data } = await _sb.from('master_divisi').select('*').order('nama_divisi');
-            document.getElementById('divisi-table-body').innerHTML = (data || []).map(d => `
-                <tr><td class="p-5 font-bold uppercase">${d.nama_divisi}</td><td class="p-5 text-center"><button onclick="hapusDivisi(${d.id})" class="text-rose-500">Hapus</button></td></tr>
-            `).join('');
         }
 
         async function simpanMenu() {
             const m = document.getElementById('input-menu-hari-ini').value.toUpperCase().trim();
             const h = document.getElementById('input-harga-menu').value || 15000;
             const t = new Date().toLocaleDateString('en-CA');
-            await _sb.from('menu_harian').upsert({ tanggal: t, nama_menu: m, harga: h });
-            alert("Menu Berhasil Diupdate!"); sinkronisasiMenu();
+            await _supabase.from('menu_harian').upsert({ tanggal: t, nama_menu: m, harga: h });
+            alert("Menu Aktif!"); sinkronisasiMenu();
+        }
+
+        // --- UTILS ---
+        async function muatDivisiKeDropdown(id, all = false) {
+            const { data } = await _supabase.from('master_divisi').select('nama_divisi').order('nama_divisi');
+            let h = all ? '<option value="SEMUA">SEMUA DIVISI</option>' : '';
+            h += (data || []).map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
+            document.getElementById(id).innerHTML = h;
         }
 
         function openEditModal(nik, nama, divisi, status) {
@@ -428,7 +477,7 @@
             const d = document.getElementById('edit-divisi').value;
             const s = document.getElementById('edit-status').value === 'true';
             const nik = document.getElementById('edit-old-nik').value;
-            await _sb.from('staff').update({ nama: n, divisi: d, is_active: s }).eq('nik', nik);
+            await _supabase.from('staff').update({ nama: n, divisi: d, is_active: s }).eq('nik', nik);
             closeEditModal(); muatStaff();
         }
 
@@ -438,13 +487,22 @@
             const n = document.getElementById('reg-nama').value.trim();
             const d = document.getElementById('reg-divisi').value;
             if(!n) return;
-            const { data, error } = await _sb.from('staff').insert([{ nama: n.toUpperCase(), divisi: d, is_active: true }]).select();
-            if(!error) { alert("Berhasil! NIK: " + data[0].nik); closeRegisModal(); muatStaff(); }
+            const { data, error } = await _supabase.from('staff').insert([{ nama: n.toUpperCase(), divisi: d, is_active: true }]).select();
+            if(!error) { alert("NIK Anda: " + data[0].nik); closeRegisModal(); muatStaff(); }
         }
 
-        async function hapusLap(id) { if(confirm("Hapus?")) { await _sb.from('laporan_makan').delete().eq('id', id); muatLaporanHarian(); } }
-        async function hapusDivisi(id) { if(confirm("Hapus?")) { await _sb.from('master_divisi').delete().eq('id', id); muatDivisi(); } }
-        
+        async function hapusLap(id) { if(confirm("Hapus?")) { await _supabase.from('laporan_makan').delete().eq('id', id); muatLaporanHarian(); } }
+        async function hapusDivisi(id) { if(confirm("Hapus?")) { await _supabase.from('master_divisi').delete().eq('id', id); muatDivisi(); } }
+
+        function cetakPDF(j) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const tid = j === 'harian' ? "#tabel-laporan-harian" : "#tabel-rekap-bulanan";
+            doc.text("KANTIN DELTA SPA - LAPORAN", 14, 15);
+            doc.autoTable({ html: tid, startY: 25, headStyles: { fillColor: [30, 41, 59] } });
+            doc.save(`Laporan_Kantin_${j}.pdf`);
+        }
+
         function updateClock() {
             const n = new Date();
             document.getElementById('clock').innerText = n.toLocaleTimeString('id-ID', { hour12: false });
