@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kantin Delta Spa - ERP v7.9</title>
+    <title>Kanti Delta Spa - ERP v8.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
     <div id="modal-regis" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border">
             <h3 class="text-xl font-bold mb-2 text-slate-800">👋 Registrasi Baru</h3>
-            <p class="text-[10px] text-slate-400 font-bold mb-6 uppercase">ID akan dibuat otomatis saat klik Simpan</p>
+            <p class="text-[10px] text-slate-400 font-bold mb-6 uppercase text-center italic">ID akan dibuat otomatis oleh sistem</p>
             <div class="space-y-4">
                 <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama Lengkap</label><input type="text" id="reg-nama" class="w-full p-3 border rounded-xl uppercase font-bold outline-none focus:border-blue-500" placeholder="NAMA ANDA"></div>
                 <div><label class="text-[10px] font-bold text-slate-400 uppercase">Divisi/Dept</label><select id="reg-divisi" class="w-full p-3 border rounded-xl bg-white font-bold"></select></div>
@@ -50,7 +50,7 @@
 
     <div id="page-scan" class="min-h-screen flex flex-col">
         <nav class="bg-white shadow-sm p-4 flex justify-between items-center px-6 border-b">
-            <h1 class="font-black text-slate-800 text-xl tracking-tighter uppercase">Kantin <span class="text-blue-600">Delta Spa</span></h1>
+            <h1 class="font-black text-slate-800 text-xl tracking-tighter uppercase">Kanti <span class="text-blue-600">Delta Spa</span></h1>
             <button onclick="showPage('admin')" class="text-[10px] font-bold text-slate-400 border px-3 py-1 rounded-full">Admin Panel</button>
         </nav>
         
@@ -66,9 +66,9 @@
 
             <div id="scan-container" class="hidden max-w-md w-full bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-50 text-center">
                 <div id="status-msg" class="hidden p-4 rounded-2xl font-bold text-sm mb-6 border"></div>
-                <input type="text" id="nik-input" autofocus placeholder="MASUKKAN ID ANDA" class="w-full p-5 border-2 rounded-2xl text-center text-2xl font-bold uppercase focus:border-blue-500 mb-6 outline-none">
+                <input type="text" id="nik-input" autofocus placeholder="MASUKKAN ID / NIK" class="w-full p-5 border-2 rounded-2xl text-center text-2xl font-bold uppercase focus:border-blue-500 mb-6 outline-none">
                 <button onclick="prosesKlaim()" class="w-full bg-blue-600 text-white font-bold py-5 rounded-2xl shadow-lg active:scale-95 uppercase tracking-widest mb-6">Klaim Makan</button>
-                <div class="border-t pt-6">
+                <div id="area-daftar-mandiri" class="border-t pt-6">
                     <button onclick="openRegisModal()" class="px-6 py-2 border-2 border-green-500 text-green-600 rounded-full font-black text-[10px] uppercase hover:bg-green-50 transition">Daftar ID Baru</button>
                 </div>
             </div>
@@ -81,7 +81,7 @@
 
     <div id="page-admin" class="hidden min-h-screen bg-slate-50 flex overflow-hidden">
         <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl">
-            <div class="p-8 text-xl font-bold text-blue-400 uppercase border-b border-slate-800">Admin Panel</div>
+            <div class="p-8 text-xl font-bold text-blue-400 uppercase border-b border-slate-800 tracking-tighter">Admin Panel</div>
             <nav class="flex-1 px-4 py-6 space-y-1">
                 <button onclick="switchAdminSubPage('staff')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition">👥 Data Staff</button>
                 <button onclick="switchAdminSubPage('master-divisi')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition font-bold">🏢 Master Divisi</button>
@@ -89,84 +89,53 @@
                 <hr class="border-slate-800 my-4">
                 <button onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition text-green-400 font-bold">✅ Lap. Scan</button>
                 <button onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition text-blue-400 font-bold">📊 Lap. Jatah</button>
+                
                 <hr class="border-slate-800 my-4">
-                <button onclick="resetAllData()" class="w-full text-left p-3.5 hover:bg-red-600 text-red-400 hover:text-white rounded-xl transition font-bold text-xs uppercase">🔥 Reset All Data</button>
+                <div class="px-3 pb-2"><p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Kontrol Sistem</p></div>
+                <button onclick="toggleRegisStatus()" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl transition text-[11px] font-bold flex justify-between items-center">
+                    <span>Daftar Mandiri</span>
+                    <span id="regis-status-label" class="text-green-400">ON</span>
+                </button>
+                <button onclick="resetAllData()" class="w-full text-left p-3 hover:bg-red-600/20 text-red-500 rounded-xl transition text-[11px] font-bold uppercase">🔥 Reset All Data</button>
+                
                 <div class="mt-10"><button onclick="showPage('scan')" class="w-full p-3 text-red-400 text-xs font-bold uppercase rounded-xl border border-red-500/20 hover:bg-red-500/10">⬅ Keluar</button></div>
             </nav>
         </aside>
 
-<div class="px-4 py-4 mt-4 border-t border-slate-800">
-    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Kontrol Fitur</p>
-    <button id="btn-toggle-regis" onclick="toggleRegisStatus()" class="w-full text-left p-3 rounded-xl transition font-bold text-xs flex justify-between items-center bg-slate-800">
-        <span>Daftar Mandiri</span>
-        <span id="regis-status-label" class="text-green-400">AKTIF</span>
-    </button>
-</div>
-
-
-        
         <main class="flex-1 p-8 overflow-y-auto custom-scroll">
             
-          <section id="sub-staff" class="admin-subpage hidden">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <div>
-            <h2 class="text-2xl font-bold uppercase tracking-tighter text-slate-800">Manajemen Staff</h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kelola data karyawan dan akses sistem</p>
-        </div>
-        <div class="flex items-center gap-3 w-full md:w-auto">
-            <div class="relative flex-1">
-                <input type="text" id="search-staff" onkeyup="filterTabelStaff()" placeholder="Cari Nama atau NIK..." class="w-full md:w-64 p-3 pl-5 border-2 border-slate-100 rounded-2xl text-xs focus:border-blue-500 outline-none transition-all shadow-sm">
-            </div>
-            <button onclick="exportStaffData()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold text-[10px] uppercase shadow-lg shadow-blue-100 transition-all flex items-center gap-2">
-                <span>📤</span> EXPORT
-            </button>
-        </div>
-    </div>
-
-    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase ml-1">NIK (Manual/Otomatis)</label>
-                <input type="text" id="add-nik" placeholder="KD-XXX" class="w-full p-4 bg-slate-50 border-none rounded-2xl font-mono font-bold uppercase focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
-            </div>
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Nama Lengkap</label>
-                <input type="text" id="add-nama" placeholder="NAMA STAFF" class="w-full p-4 bg-slate-50 border-none rounded-2xl font-bold uppercase focus:ring-2 focus:ring-blue-500 outline-none text-slate-700">
-            </div>
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Divisi Kerja</label>
-                <select id="add-divisi-select" class="w-full p-4 bg-slate-50 border-none rounded-2xl font-bold uppercase focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"></select>
-            </div>
-            <button onclick="simpanStaff()" class="bg-slate-900 hover:bg-black text-white p-4 rounded-2xl font-bold uppercase tracking-widest transition-all shadow-xl shadow-slate-200">
-                Simpan Staff
-            </button>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-slate-50/50 border-b border-slate-100">
-                    <th class="p-6 text-[10px] font-black text-slate-400 uppercase">ID / NIK</th>
-                    <th class="p-6 text-[10px] font-black text-slate-400 uppercase">Nama Lengkap</th>
-                    <th class="p-6 text-[10px] font-black text-slate-400 uppercase text-center">Status</th>
-                    <th class="p-6 text-[10px] font-black text-slate-400 uppercase">Divisi</th>
-                    <th class="p-6 text-[10px] font-black text-slate-400 uppercase text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="staff-table-body" class="divide-y divide-slate-50">
-                </tbody>
-        </table>
-    </div>
-</section>
-                <div class="bg-white p-6 rounded-3xl border grid grid-cols-4 gap-4 items-end mb-6 shadow-sm">
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2.5 border rounded-xl font-mono uppercase"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama</label><input type="text" id="add-nama" class="w-full p-2.5 border rounded-xl uppercase font-bold"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Divisi</label><select id="add-divisi-select" class="w-full p-2.5 border rounded-xl bg-white"></select></div>
-                    <button onclick="simpanStaff()" class="bg-slate-900 text-white p-2.5 rounded-xl font-bold uppercase">Simpan</button>
+            <section id="sub-staff" class="admin-subpage hidden">
+                <div class="flex justify-between items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold uppercase tracking-tight">Manajemen Staff</h2>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Total data staff terdaftar</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="search-staff" onkeyup="filterTabelStaff()" placeholder="Cari Nama/NIK..." class="p-2.5 px-4 border rounded-xl text-xs w-64 outline-none focus:border-blue-500 shadow-sm">
+                        <button onclick="exportStaffData()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase shadow-md">📤 Export</button>
+                    </div>
                 </div>
-                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
-                    <table class="w-full text-left text-xs"><tbody id="staff-table-body" class="divide-y"></tbody></table>
+
+                <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-8">
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase ml-1">NIK (Kosongkan utk Auto)</label><input type="text" id="add-nik" placeholder="KD-XXX" class="w-full p-3 border rounded-xl font-mono uppercase text-xs"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nama Lengkap</label><input type="text" id="add-nama" class="w-full p-3 border rounded-xl uppercase font-bold text-xs"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Divisi</label><select id="add-divisi-select" class="w-full p-3 border rounded-xl bg-white text-xs"></select></div>
+                    <button onclick="simpanStaff()" class="bg-slate-900 text-white p-3 rounded-xl font-bold uppercase text-xs shadow-lg">Simpan Staff</button>
+                </div>
+
+                <div class="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 border-b">
+                            <tr>
+                                <th class="p-4 text-slate-400 uppercase font-black">ID / NIK</th>
+                                <th class="p-4 text-slate-400 uppercase font-black">Nama Lengkap</th>
+                                <th class="p-4 text-slate-400 uppercase font-black text-center">Status</th>
+                                <th class="p-4 text-slate-400 uppercase font-black">Divisi</th>
+                                <th class="p-4 text-slate-400 uppercase font-black text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-table-body" class="divide-y divide-slate-50"></tbody>
+                    </table>
                 </div>
             </section>
 
@@ -227,39 +196,106 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        // --- KONFIGURASI SUPABASE ---
+       const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
+        // --- SISTEM TOGGLE DAFTAR MANDIRI ---
+        function cekStatusRegistrasi() {
+            const isLocked = localStorage.getItem('regis_locked') === 'true';
+            const areaDaftar = document.getElementById('area-daftar-mandiri');
+            const labelStatus = document.getElementById('regis-status-label');
 
-function filterTabelStaff() {
-    // 1. Ambil input pencarian
-    const input = document.getElementById("search-staff");
-    const filter = input.value.toUpperCase();
-    const tableBody = document.getElementById("staff-table-body");
-    const tr = tableBody.getElementsByTagName("tr");
-
-    // 2. Loop semua baris tabel, sembunyikan yang tidak cocok dengan pencarian
-    for (let i = 0; i < tr.length; i++) {
-        // Kolom 0 = NIK, Kolom 1 = Nama
-        const tdNik = tr[i].getElementsByTagName("td")[0];
-        const tdNama = tr[i].getElementsByTagName("td")[1];
-        
-        if (tdNik || tdNama) {
-            const txtNik = tdNik.textContent || tdNik.innerText;
-            const txtNama = tdNama.textContent || tdNama.innerText;
-            
-            if (txtNik.toUpperCase().indexOf(filter) > -1 || txtNama.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = ""; // Tampilkan
+            if (isLocked) {
+                if (areaDaftar) areaDaftar.classList.add('hidden');
+                if (labelStatus) { labelStatus.innerText = 'OFF'; labelStatus.className = 'text-red-500'; }
             } else {
-                tr[i].style.display = "none"; // Sembunyikan
+                if (areaDaftar) areaDaftar.classList.remove('hidden');
+                if (labelStatus) { labelStatus.innerText = 'ON'; labelStatus.className = 'text-green-400'; }
             }
         }
-    }
-}
-       
-        // --- EXPORT TOOLS ---
+
+        function toggleRegisStatus() {
+            const isLocked = localStorage.getItem('regis_locked') === 'true';
+            localStorage.setItem('regis_locked', !isLocked);
+            cekStatusRegistrasi();
+        }
+
+        // --- FITUR PENCARIAN STAFF ---
+        function filterTabelStaff() {
+            const filter = document.getElementById("search-staff").value.toUpperCase();
+            const tr = document.getElementById("staff-table-body").getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) {
+                const nik = tr[i].getElementsByTagName("td")[0];
+                const nama = tr[i].getElementsByTagName("td")[1];
+                if (nik || nama) {
+                    const txtNik = nik.textContent || nik.innerText;
+                    const txtNama = nama.textContent || nama.innerText;
+                    tr[i].style.display = (txtNik.toUpperCase().indexOf(filter) > -1 || txtNama.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+                }
+            }
+        }
+
+        // --- RESET DATA (SECURITY) ---
+        async function resetAllData() {
+            const p1 = confirm("⚠️ PERINGATAN KERAS!\nHapus semua data Staff dan Laporan Scan?");
+            if (!p1) return;
+            if (prompt("Ketik 'HAPUS' untuk konfirmasi:") !== 'HAPUS') return alert("Reset dibatalkan.");
+
+            try {
+                await _supabase.from('laporan_makan').delete().neq('id', 0);
+                await _supabase.from('staff').delete().neq('nik', '0');
+                alert("✅ DATA BERHASIL DIRESET."); location.reload();
+            } catch (e) { alert("Gagal: " + e.message); }
+        }
+
+        // --- REGISTRASI MANDIRI (SERVER-SIDE AUTO NIK) ---
+        async function prosesSimpanMandiri() {
+            const btn = document.getElementById('btn-submit-regis');
+            const n = document.getElementById('reg-nama').value.trim();
+            const d = document.getElementById('reg-divisi').value;
+            if(!n) return alert("Isi nama Anda!");
+            
+            btn.disabled = true; btn.innerText = "Processing...";
+            try {
+                // Jangan kirim NIK, biar database (Trigger) yang buat
+                const { data, error } = await _supabase.from('staff').insert([{ nama: n.toUpperCase(), divisi: d, is_active: true }]).select();
+                if (error) throw error;
+                alert(`✅ BERHASIL!\nID ANDA: ${data[0].nik}`);
+                document.getElementById('reg-nama').value = ""; closeRegisModal();
+            } catch (e) { alert("Error: " + e.message); }
+            finally { btn.disabled = false; btn.innerText = "Simpan & Daftar"; }
+        }
+
+        // --- MANAJEMEN STAFF ---
+        async function muatStaff() {
+            const { data } = await _supabase.from('staff').select('*').order('nama');
+            document.getElementById('staff-table-body').innerHTML = (data || []).map(s => `
+                <tr class="hover:bg-slate-50 ${!s.is_active ? 'opacity-50 bg-red-50' : ''}">
+                    <td class="p-4 font-mono font-bold text-blue-600">${s.nik}</td>
+                    <td class="p-4 font-bold uppercase">${s.nama}</td>
+                    <td class="p-4 text-center"><span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${s.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${s.is_active ? 'Aktif' : 'Non-Aktif'}</span></td>
+                    <td class="p-4 uppercase font-bold text-slate-400">${s.divisi || '-'}</td>
+                    <td class="p-4 text-right"><button onclick="openEditModal('${s.nik}', '${s.nama}', '${s.divisi}', ${s.is_active})" class="text-blue-500 font-bold uppercase hover:underline text-[10px]">Edit</button></td>
+                </tr>`).join('');
+        }
+
+        async function simpanStaff() {
+            const n = document.getElementById('add-nama').value;
+            const k = document.getElementById('add-nik').value; // Boleh diisi manual
+            const d = document.getElementById('add-divisi-select').value;
+            if(!n) return alert("Nama wajib diisi!");
+            
+            let obj = { nama: n.toUpperCase(), divisi: d, is_active: true };
+            if(k) obj.nik = k.toUpperCase(); // Jika NIK diisi manual
+
+            const { error } = await _supabase.from('staff').insert([obj]);
+            if(error) alert(error.message); else { muatStaff(); document.getElementById('add-nama').value=''; document.getElementById('add-nik').value=''; }
+        }
+
+        // --- TOOLS ---
         function downloadCSV(name, csv) {
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -270,50 +306,43 @@ function filterTabelStaff() {
             let csv = "NIK,Nama,Status,Divisi\n";
             document.querySelectorAll("#staff-table-body tr").forEach(tr => {
                 const cols = Array.from(tr.querySelectorAll("td")).map(td => td.innerText.replace(/,/g, ''));
-                csv += cols.slice(0, 4).join(",") + "\n";
+                if(cols.length > 0) csv += cols.slice(0, 4).join(",") + "\n";
             });
             downloadCSV("Master_Staff.csv", csv);
         }
 
-        function exportLaporanScan() {
-            let csv = "Waktu,Nama,Divisi\n";
-            document.querySelectorAll("#scan-table-body tr").forEach(tr => {
-                const cols = Array.from(tr.querySelectorAll("td")).map(td => td.innerText.replace(/,/g, ''));
-                csv += cols.join(",") + "\n";
-            });
-            downloadCSV("Laporan_Scan.csv", csv);
+        // --- NAVIGATION & INIT ---
+        function showPage(p) {
+            if(p==='admin') { if(prompt("Pass:")!=="kanti123") return; document.getElementById('page-admin').classList.remove('hidden'); document.getElementById('page-scan').classList.add('hidden'); switchAdminSubPage('staff'); }
+            else { document.getElementById('page-admin').classList.add('hidden'); document.getElementById('page-scan').classList.remove('hidden'); sinkronisasiMenu(); cekStatusRegistrasi(); }
         }
 
-        function exportLaporanDetail() {
-            let csv = "Nama,Status,Biaya\n";
-            document.querySelectorAll("#detail-table-body tr").forEach(tr => {
-                const cols = Array.from(tr.querySelectorAll("td")).map(td => td.innerText.replace(/,/g, ''));
-                csv += cols.join(",") + "\n";
-            });
-            downloadCSV("Rekap_Biaya.csv", csv);
+        async function switchAdminSubPage(sub) {
+            document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
+            document.getElementById('sub-' + sub).classList.remove('hidden');
+            if(sub==='staff') { muatStaff(); muatDivisiKeDropdown('add-divisi-select'); }
+            if(sub==='master-divisi') muatDivisi();
+            if(sub==='laporan-scan') { document.getElementById('scan-filter-date').valueAsDate = new Date(); muatDivisiKeDropdown('scan-filter-divisi', true); muatLaporanScan(); }
+            if(sub==='laporan-detail') { document.getElementById('det-filter-date').valueAsDate = new Date(); muatDivisiKeDropdown('det-filter-divisi', true); muatLaporanDetail(); }
         }
 
-        // --- RESET DATA (SECURITY) ---
-        async function resetAllData() {
-            const confirm1 = confirm("⚠️ PERINGATAN KERAS!\n\nAnda akan menghapus SEMUA data Staff dan SEMUA Laporan Scan.\n\nApakah Anda yakin?");
-            if (!confirm1) return;
-
-            const confirmText = prompt("Ketik kata 'HAPUS' untuk melanjutkan:");
-            if (confirmText !== 'HAPUS') return alert("Reset dibatalkan. Kata kunci salah.");
-
-            try {
-                // Hapus data dari semua tabel utama
-                await _supabase.from('laporan_makan').delete().neq('id', 0); // Hapus semua baris
-                await _supabase.from('staff').delete().neq('nik', '0'); // Hapus semua staff
-                
-                alert("✅ SEMUA DATA BERHASIL DIRESET.");
-                location.reload(); // Refresh halaman
-            } catch (e) {
-                alert("Gagal reset: " + e.message);
-            }
+        // --- (Fungsi lain seperti muatDivisi, simpanMenu, prosesKlaim tetap sama seperti versi sebelumnya) ---
+        async function muatDivisi() {
+            const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
+            document.getElementById('divisi-list').innerHTML = (data || []).map(d => `<div class="p-4 border rounded-2xl bg-white flex justify-between uppercase font-bold text-[10px] shadow-sm"><span>${d.nama_divisi}</span><button onclick="hapusDivisi(${d.id})" class="text-red-500">HAPUS</button></div>`).join('');
         }
-
-        // --- CORE FUNCTIONS ---
+        async function simpanDivisi() {
+            const n = document.getElementById('new-divisi-name').value;
+            if(!n) return;
+            await _supabase.from('master_divisi').insert([{ nama_divisi: n.toUpperCase() }]);
+            document.getElementById('new-divisi-name').value = ''; muatDivisi();
+        }
+        async function muatDivisiKeDropdown(target, all = false) {
+            const { data } = await _supabase.from('master_divisi').select('nama_divisi').order('nama_divisi');
+            let h = all ? '<option value="SEMUA">SEMUA DIVISI</option>' : '';
+            h += (data || []).map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
+            document.getElementById(target).innerHTML = h;
+        }
         async function sinkronisasiMenu() {
             const tgl = new Date().toISOString().split('T')[0];
             const { data } = await _supabase.from('menu_harian').select('nama_menu').eq('tanggal', tgl).maybeSingle();
@@ -328,140 +357,43 @@ function filterTabelStaff() {
                 scanBox.classList.add('hidden'); noMenuMsg.classList.remove('hidden');
             }
         }
-
-       async function prosesSimpanMandiri() {
-    const btn = document.getElementById('btn-submit-regis');
-    const namaInput = document.getElementById('reg-nama').value.trim();
-    const divisiInput = document.getElementById('reg-divisi').value;
-
-    if(!namaInput) return alert("Nama tidak boleh kosong!");
-    
-    btn.disabled = true;
-    btn.innerText = "Mendaftarkan...";
-
-    try {
-        // Kita HANYA kirim nama dan divisi. 
-        // Database (Trigger) akan otomatis mengisi NIK.
-        const { data, error } = await _supabase
-            .from('staff')
-            .insert([{ 
-                nama: namaInput.toUpperCase(), 
-                divisi: divisiInput, 
-                is_active: true 
-            }])
-            .select(); 
-
-        if (error) throw error;
-
-        // Ambil NIK yang baru saja dibuat oleh database
-        const nikBaru = data[0].nik;
-
-        alert(`✅ PENDAFTARAN BERHASIL!\n\nID ANDA: ${nikBaru}`);
+        async function simpanMenu() {
+            const m = document.getElementById('input-menu-hari-ini').value;
+            const h = document.getElementById('input-harga-menu').value || 0;
+            const t = new Date().toISOString().split('T')[0];
+            await _supabase.from('menu_harian').upsert({ tanggal: t, nama_menu: m, harga: h }, { onConflict: 'tanggal' });
+            sinkronisasiMenu(); alert("Menu Aktif!");
+        }
+        async function hapusMenuHariIni() {
+            const t = new Date().toISOString().split('T')[0];
+            await _supabase.from('menu_harian').delete().eq('tanggal', t);
+            sinkronisasiMenu();
+        }
+        async function prosesKlaim() {
+            const input = document.getElementById('nik-input');
+            const nik = input.value.trim().toUpperCase();
+            const box = document.getElementById('status-msg');
+            if(!nik) return;
+            const { data: s } = await _supabase.from('staff').select('*').eq('nik', nik).maybeSingle();
+            box.classList.remove('hidden', 'bg-green-100', 'bg-red-100', 'text-green-700', 'text-red-700');
+            if(s && s.is_active) {
+                const t = new Date().toISOString().split('T')[0];
+                const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
+                if(su.length > 0) { box.innerText = "JATAH HABIS"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
+                else {
+                    await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi }]);
+                    box.innerText = "BERHASIL: " + s.nama; box.className = "p-4 rounded-xl bg-green-100 text-green-700 mb-4 font-bold";
+                }
+            } else { box.innerText = "ID TIDAK AKTIF"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
+            input.value = ''; setTimeout(() => box.classList.add('hidden'), 3000);
+        }
+        function updateClock() {
+            const n = new Date(); document.getElementById('clock').innerText = n.toLocaleTimeString('id-ID');
+            document.getElementById('date-display').innerText = n.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+        }
+        function openRegisModal() { muatDivisiKeDropdown('reg-divisi'); document.getElementById('modal-regis').classList.remove('hidden'); }
+        function closeRegisModal() { document.getElementById('modal-regis').classList.add('hidden'); }
         
-        document.getElementById('reg-nama').value = "";
-        closeRegisModal();
-        if(typeof muatStaff === "function") muatStaff(); 
-        
-    } catch (err) {
-        console.error("Error pendaftaran:", err);
-        alert("Gagal: " + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "Simpan & Daftar";
-    }
-}
-
-        // --- ADMIN HELPERS ---
-        async function muatStaff() {
-    const { data } = await _supabase.from('staff').select('*').order('nama');
-    const tableBody = document.getElementById('staff-table-body');
-    
-    tableBody.innerHTML = (data || []).map(s => `
-        <tr class="hover:bg-slate-50/50 transition-colors ${!s.is_active ? 'bg-red-50/30' : ''}">
-            <td class="p-6 font-mono font-bold text-blue-600">${s.nik}</td>
-            <td class="p-6 font-bold uppercase text-slate-700">${s.nama}</td>
-            <td class="p-6 text-center">
-                <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase shadow-sm ${s.is_active ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}">
-                    ${s.is_active ? 'Aktif' : 'Non-Aktif'}
-                </span>
-            </td>
-            <td class="p-6 font-bold text-slate-400 uppercase text-[11px]">${s.divisi || '-'}</td>
-            <td class="p-6 text-right">
-                <button onclick="openEditModal('${s.nik}', '${s.nama}', '${s.divisi}', ${s.is_active})" 
-                    class="text-blue-600 hover:text-blue-800 font-bold uppercase text-[10px] tracking-widest border-b-2 border-transparent hover:border-blue-600 transition-all">
-                    Edit
-                </button>
-            </td>
-        </tr>`).join('');
-}
-
-        async function simpanStaff() {
-            const n = document.getElementById('add-nama').value;
-            const k = document.getElementById('add-nik').value;
-            const d = document.getElementById('add-divisi-select').value;
-            if(!n || !k) return alert("NIK & Nama wajib!");
-            await _supabase.from('staff').insert([{ nik: k.toUpperCase(), nama: n.toUpperCase(), divisi: d, is_active: true }]);
-            muatStaff();
-        }
-
-        async function muatDivisi() {
-            const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
-            document.getElementById('divisi-list').innerHTML = (data || []).map(d => `<div class="p-4 border rounded-2xl bg-white flex justify-between uppercase font-bold text-[10px] shadow-sm"><span>${d.nama_divisi}</span><button onclick="hapusDivisi(${d.id})" class="text-red-500">HAPUS</button></div>`).join('');
-        }
-
-        async function simpanDivisi() {
-            const n = document.getElementById('new-divisi-name').value;
-            if(!n) return;
-            await _supabase.from('master_divisi').insert([{ nama_divisi: n.toUpperCase() }]);
-            document.getElementById('new-divisi-name').value = ''; muatDivisi();
-        }
-
-        async function muatDivisiKeDropdown(target, all = false) {
-            const { data } = await _supabase.from('master_divisi').select('nama_divisi').order('nama_divisi');
-            let h = all ? '<option value="SEMUA">SEMUA DIVISI</option>' : '';
-            h += (data || []).map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
-            document.getElementById(target).innerHTML = h;
-        }
-
-        async function muatLaporanScan() {
-            const t = document.getElementById('scan-filter-date').value;
-            const d = document.getElementById('scan-filter-divisi').value;
-            let q = _supabase.from('laporan_makan').select('*').gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
-            if(d !== 'SEMUA') q = q.eq('divisi', d);
-            const { data } = await q.order('waktu', { ascending: false });
-            document.getElementById('scan-table-body').innerHTML = (data || []).map(l => `<tr><td class="p-4 font-bold text-blue-600">${new Date(l.waktu).toLocaleTimeString()}</td><td class="p-4 font-bold uppercase">${l.nama_staff}</td><td class="p-4 uppercase text-slate-400 font-bold">${l.divisi}</td></tr>`).join('');
-        }
-
-        async function muatLaporanDetail() {
-            const t = document.getElementById('det-filter-date').value;
-            const div = document.getElementById('det-filter-divisi').value;
-            const { data: m } = await _supabase.from('menu_harian').select('harga').eq('tanggal', t).maybeSingle();
-            const h = m ? m.harga : 0;
-            let qs = _supabase.from('staff').select('*');
-            if(div !== 'SEMUA') qs = qs.eq('divisi', div);
-            const { data: staffs } = await qs.order('nama');
-            const { data: klaims } = await _supabase.from('laporan_makan').select('nik_staff').gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
-            document.getElementById('detail-table-body').innerHTML = (staffs || []).map(s => {
-                const k = klaims.some(x => x.nik_staff === s.nik);
-                return `<tr><td class="p-4 font-bold uppercase">${s.nama}</td><td class="p-4 font-black text-center ${k?'text-green-600':'text-slate-300'}">${k?'✅ SCAN OK':'-'}</td><td class="p-4 text-right font-bold">${formatIDR(k?h:0)}</td></tr>`;
-            }).join('');
-        }
-
-        // --- NAVIGATION ---
-        function showPage(p) {
-            if(p==='admin') { if(prompt("Pass:")!=="kanti123") return; document.getElementById('page-admin').classList.remove('hidden'); document.getElementById('page-scan').classList.add('hidden'); switchAdminSubPage('staff'); }
-            else { document.getElementById('page-admin').classList.add('hidden'); document.getElementById('page-scan').classList.remove('hidden'); sinkronisasiMenu(); }
-        }
-
-        async function switchAdminSubPage(sub) {
-            document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
-            document.getElementById('sub-' + sub).classList.remove('hidden');
-            if(sub==='staff') { muatStaff(); muatDivisiKeDropdown('add-divisi-select'); }
-            if(sub==='master-divisi') muatDivisi();
-            if(sub==='laporan-scan') { document.getElementById('scan-filter-date').valueAsDate = new Date(); muatDivisiKeDropdown('scan-filter-divisi', true); muatLaporanScan(); }
-            if(sub==='laporan-detail') { document.getElementById('det-filter-date').valueAsDate = new Date(); muatDivisiKeDropdown('det-filter-divisi', true); muatLaporanDetail(); }
-        }
-
         async function openEditModal(nik, nama, divisi, status) {
             document.getElementById('edit-old-nik').value = nik;
             document.getElementById('edit-nama').value = nama;
@@ -480,108 +412,10 @@ function filterTabelStaff() {
             closeEditModal(); muatStaff();
         }
 
-        async function simpanMenu() {
-            const m = document.getElementById('input-menu-hari-ini').value;
-            const h = document.getElementById('input-harga-menu').value || 0;
-            const t = new Date().toISOString().split('T')[0];
-            await _supabase.from('menu_harian').upsert({ tanggal: t, nama_menu: m, harga: h }, { onConflict: 'tanggal' });
-            sinkronisasiMenu(); alert("Menu Aktif!");
-        }
-
-        async function hapusMenuHariIni() {
-            const t = new Date().toISOString().split('T')[0];
-            await _supabase.from('menu_harian').delete().eq('tanggal', t);
-            sinkronisasiMenu();
-        }
-
-// --- KONTROL TOMBOL DAFTAR MANDIRI ---
-
-// 1. Fungsi untuk mengecek status saat halaman dimuat
-function cekStatusRegistrasi() {
-    const isLocked = localStorage.getItem('regis_locked') === 'true';
-    const btnDaftarHalamanDepan = document.querySelector('button[onclick="openRegisModal()"]');
-    const labelStatusSidebar = document.getElementById('regis-status-label');
-    const btnSidebar = document.getElementById('btn-toggle-regis');
-
-    if (isLocked) {
-        // Jika dikunci
-        if (btnDaftarHalamanDepan) btnDaftarHalamanDepan.classList.add('hidden');
-        if (labelStatusSidebar) {
-            labelStatusSidebar.innerText = 'NON-AKTIF';
-            labelStatusSidebar.className = 'text-red-500';
-        }
-    } else {
-        // Jika aktif
-        if (btnDaftarHalamanDepan) btnDaftarHalamanDepan.classList.remove('hidden');
-        if (labelStatusSidebar) {
-            labelStatusSidebar.innerText = 'AKTIF';
-            labelStatusSidebar.className = 'text-green-400';
-        }
-    }
-}
-
-// 2. Fungsi untuk mengubah status (ON/OFF)
-function toggleRegisStatus() {
-    const isLocked = localStorage.getItem('regis_locked') === 'true';
-    
-    if (!isLocked) {
-        if (confirm("Matikan fitur pendaftaran mandiri untuk staff?")) {
-            localStorage.setItem('regis_locked', 'true');
-        }
-    } else {
-        if (confirm("Aktifkan kembali pendaftaran mandiri?")) {
-            localStorage.setItem('regis_locked', 'false');
-        }
-    }
-    
-    cekStatusRegistrasi(); // Update tampilan seketika
-}
-
-// 3. Panggil fungsi cekStatus setiap kali halaman dibuka/pindah page
-// Tambahkan baris ini di dalam fungsi showPage(p) Anda:
-// if(p === 'scan') cekStatusRegistrasi();
-
-
-
-        
-        async function prosesKlaim() {
-            const input = document.getElementById('nik-input');
-            const nik = input.value.trim().toUpperCase();
-            const box = document.getElementById('status-msg');
-            if(!nik) return;
-            const { data: s } = await _supabase.from('staff').select('*').eq('nik', nik).maybeSingle();
-            box.classList.remove('hidden', 'bg-green-100', 'bg-red-100', 'text-green-700', 'text-red-700');
-            if(s && s.is_active) {
-                const t = new Date().toISOString().split('T')[0];
-                const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
-                if(su.length > 0) { box.innerText = "SAYANG SEKALI JATAH MAKAN ANDA HABIS"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
-                else {
-                    await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi }]);
-                    box.innerText = "BERHASIL SILAHKAN MAKAN KAKA: " + s.nama; box.className = "p-4 rounded-xl bg-green-100 text-green-700 mb-4 font-bold";
-                }
-            } else { box.innerText = "ID TIDAK AKTIF"; box.className = "p-4 rounded-xl bg-red-100 text-red-700 mb-4 font-bold"; }
-            input.value = ''; setTimeout(() => box.classList.add('hidden'), 3000);
-        }
-
-        function updateClock() {
-            const n = new Date(); document.getElementById('clock').innerText = n.toLocaleTimeString('id-ID');
-            document.getElementById('date-display').innerText = n.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-            if(n.getSeconds() % 15 === 0) sinkronisasiMenu();
-        }
-        function openRegisModal() { muatDivisiKeDropdown('reg-divisi'); document.getElementById('modal-regis').classList.remove('hidden'); }
-        function closeRegisModal() { document.getElementById('modal-regis').classList.add('hidden'); }
-
-        // Jalankan pengecekan saat startup
-        cekStatusRegistrasi();
-
-        setInterval(updateClock, 1000); updateClock(); sinkronisasiMenu();
+        // --- INIT ---
+        setInterval(updateClock, 1000); updateClock(); 
+        sinkronisasiMenu(); cekStatusRegistrasi();
         document.getElementById('nik-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') prosesKlaim(); });
     </script>
 </body>
 </html>
-
-
-
-
-
-
