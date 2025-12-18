@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - ERP v9.7 Final</title>
+    <title>Kantin Delta Spa - ERP v9.7 Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -44,11 +44,11 @@
     <div id="modal-regis" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[200] flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl border text-center">
             <h3 class="text-xl font-black mb-2 text-slate-800">Registrasi Staff</h3>
-            <p class="text-[9px] text-slate-400 font-bold mb-6 uppercase tracking-widest">Kanti Delta Spa System</p>
+            <p class="text-[9px] text-slate-400 font-bold mb-6 uppercase tracking-widest">Kantin Delta Spa System</p>
             <div class="space-y-4 text-left">
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nama Lengkap</label>
-                    <input type="text" id="reg-nama" class="w-full p-3 border rounded-2xl uppercase font-bold outline-none focus:border-blue-500 text-xs" placeholder="SESUAI KTP">
+                    <input type="text" id="reg-nama" class="w-full p-3 border rounded-2xl uppercase font-bold outline-none focus:border-blue-500 text-xs" placeholder="Nama harus Sesuai">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Divisi Kerja</label>
@@ -64,7 +64,7 @@
 
     <div id="page-scan" class="h-screen flex flex-col overflow-y-auto">
         <nav class="bg-white p-4 flex justify-between items-center px-6 border-b sticky top-0 z-50">
-            <h1 class="font-black text-slate-800 text-lg uppercase">Kanti <span class="text-blue-600">Delta Spa</span></h1>
+            <h1 class="font-black text-slate-800 text-lg uppercase">Kantin <span class="text-blue-600">Delta Spa</span></h1>
             <button onclick="showPage('admin')" class="text-[10px] font-black text-slate-400 border px-4 py-1.5 rounded-full uppercase">Admin Login</button>
         </nav>
         
@@ -97,7 +97,7 @@
         <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col h-full shadow-2xl">
             <div class="p-6 border-b border-slate-800 flex items-center gap-3">
                 <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-slate-900 font-black italic">K</div>
-                <span class="font-black text-sm tracking-tighter uppercase text-amber-400">Admin Kanti</span>
+                <span class="font-black text-sm tracking-tighter uppercase text-amber-400">Admin Kantin</span>
             </div>
             
             <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scroll">
@@ -481,7 +481,7 @@
         function cetakPDF(type) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.text(`KANTI SPA REPORT - ${type.toUpperCase()}`, 14, 20);
+            doc.text(`KANTIN SPA REPORT - ${type.toUpperCase()}`, 14, 20);
             const tableId = type === 'staff' ? "#staff-table" : (type === 'scan' ? "#scan-table" : "#detail-table");
             doc.autoTable({ html: tableId, startY: 30 });
             doc.save(`Kanti_Report_${type}.pdf`);
@@ -530,10 +530,10 @@
                 const t = new Date().toISOString().split('T')[0];
                 const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
                 if(su.length > 0) { 
-                    box.innerText = "SUDAH SCAN"; box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold text-center"; 
+                    box.innerText = "Sayang sekali Jatah Makan Anda Hari ini Habis"; box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold text-center"; 
                 } else {
                     await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi }]);
-                    box.innerText = "BERHASIL: " + s.nama; box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold text-center";
+                    box.innerText = "BERHASIL SILAHKAN MAKAN: " + s.nama; box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold text-center";
                 }
             } else { 
                 box.innerText = "ID SALAH/NON-AKTIF"; box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold text-center"; 
@@ -578,3 +578,4 @@
     </script>
 </body>
 </html>
+
