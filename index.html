@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - ERP v4.1</title>
+    <title>Kanti Delta Spa - ERP v4.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
@@ -19,100 +19,89 @@
 
     <div id="page-scan" class="min-h-screen flex flex-col overflow-y-auto">
         <nav class="bg-white shadow-sm p-4 flex justify-between items-center px-6 border-b">
-            <h1 class="font-black text-slate-800 tracking-tighter text-xl">KANTI <span class="text-blue-600">DELTA SPA</span></h1>
-            <button onclick="showPage('admin')" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-100 px-3 py-1 rounded-full">Admin Panel</button>
+            <h1 class="font-black text-slate-800 text-xl tracking-tighter uppercase">Kanti <span class="text-blue-600">Delta Spa</span></h1>
+            <button onclick="showPage('admin')" class="text-[10px] font-bold text-slate-400 border px-3 py-1 rounded-full uppercase hover:bg-slate-50 transition">Admin Panel</button>
         </nav>
-        
         <main class="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-            
             <div class="text-center">
-                <div id="clock" class="digital-clock text-6xl font-bold text-slate-800 drop-shadow-sm">00:00:00</div>
-                <div id="date-display" class="text-sm font-bold text-blue-500 uppercase tracking-widest mt-2">Memuat Tanggal...</div>
+                <div id="clock" class="digital-clock text-6xl font-bold text-slate-800">00:00:00</div>
+                <div id="date-display" class="text-sm font-bold text-blue-500 uppercase mt-2">Memuat...</div>
             </div>
-
-            <div class="bg-orange-50 border border-orange-100 p-6 rounded-[2.5rem] w-full max-w-md text-center shadow-sm relative">
-                <span class="text-[10px] font-bold text-orange-400 uppercase tracking-widest block mb-2">Menu Makan Hari Ini</span>
+            <div class="bg-orange-50 border border-orange-100 p-6 rounded-[2.5rem] w-full max-w-md text-center shadow-sm">
+                <span class="text-[10px] font-bold text-orange-400 uppercase block mb-1">Menu Hari Ini</span>
                 <p id="display-menu-hari-ini" class="text-2xl font-black text-orange-700 italic">Memuat...</p>
-                </div>
-
-            <div class="max-w-md w-full bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100">
-                <div id="status-msg" class="hidden p-4 rounded-2xl font-bold text-sm mb-6 text-center animate-pulse"></div>
-                
-                <div class="space-y-4">
-                    <label class="text-center block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Masukkan NIK Anda</label>
-                    <input type="text" id="nik-input" autofocus
-                        placeholder="CONTOH: 2024001" 
-                        class="w-full p-5 border-2 border-slate-100 rounded-2xl text-center text-2xl font-bold uppercase outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all">
-                    
-                    <button onclick="prosesKlaim()" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 text-lg uppercase tracking-widest">
-                        Klaim Jatah Makan
-                    </button>
-                </div>
             </div>
-
-            <p class="text-[10px] text-slate-300 font-medium uppercase tracking-widest">Input NIK secara manual atau gunakan alat scanner</p>
+            <div class="max-w-md w-full bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-50">
+                <div id="status-msg" class="hidden p-4 rounded-2xl font-bold text-sm mb-6 text-center"></div>
+                <input type="text" id="nik-input" autofocus placeholder="MASUKKAN NIK" class="w-full p-5 border-2 rounded-2xl text-center text-2xl font-bold uppercase outline-none focus:border-blue-500 transition-all">
+                <button onclick="prosesKlaim()" class="w-full mt-4 bg-blue-600 text-white font-bold py-5 rounded-2xl shadow-lg active:scale-95 uppercase tracking-widest">Klaim Makan</button>
+            </div>
         </main>
     </div>
 
     <div id="page-admin" class="hidden min-h-screen bg-slate-50 flex overflow-hidden">
-        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl">
+        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col">
             <div class="p-8">
-                <h2 class="text-xl font-bold text-blue-400">Kanti Admin</h2>
-                <p class="text-[9px] text-slate-500 uppercase">v4.1 Hidden Mode</p>
+                <h2 class="text-xl font-bold text-blue-400 tracking-tighter">KANTI ADMIN</h2>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest">Version 4.3</p>
             </div>
             <nav class="flex-1 px-4 space-y-1 text-sm font-medium">
-                <button onclick="switchAdminSubPage('staff')" class="w-full flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">👥 Staff</button>
-                <button onclick="switchAdminSubPage('master-divisi')" class="w-full flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">🏢 Divisi</button>
-                <button onclick="switchAdminSubPage('menu-makan')" class="w-full flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">🍱 Menu & Harga</button>
-                <button onclick="switchAdminSubPage('sisa-jatah')" class="w-full flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">⏳ Sisa Jatah</button>
-                <button onclick="switchAdminSubPage('laporan')" class="w-full flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition text-blue-400">📊 Laporan & Biaya</button>
-                <div class="pt-10"><button onclick="showPage('scan')" class="w-full p-3 text-red-400 hover:bg-red-500/10 rounded-xl border border-red-500/20 text-xs">⬅ KELUAR</button></div>
+                <button onclick="switchAdminSubPage('staff')" class="w-full text-left flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">👥 Manajemen Staff</button>
+                <button onclick="switchAdminSubPage('master-divisi')" class="w-full text-left flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">🏢 Manajemen Divisi</button>
+                <button onclick="switchAdminSubPage('menu-makan')" class="w-full text-left flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">🍱 Menu & Harga</button>
+                <button onclick="switchAdminSubPage('laporan')" class="w-full text-left flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition text-blue-400 font-bold">📊 Laporan & Rekap</button>
+                <div class="pt-10"><button onclick="showPage('scan')" class="w-full p-3 text-red-400 hover:bg-red-500/10 rounded-xl border border-red-500/20 text-xs text-center font-bold">⬅ KELUAR</button></div>
             </nav>
         </aside>
 
         <main class="flex-1 p-8 overflow-y-auto custom-scroll">
-            <div id="modal-edit" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                <div class="bg-white w-full max-w-xl rounded-[2.5rem] p-8 shadow-2xl text-slate-800">
-                    <h3 class="text-2xl font-bold mb-6">✏️ Edit Staff</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="hidden" id="edit-nik">
-                        <div class="col-span-2 space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Nama Staff</label>
-                            <input type="text" id="edit-nama" class="w-full p-3 border rounded-xl">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Divisi</label>
-                            <select id="edit-divisi" class="w-full p-3 border rounded-xl bg-white"></select>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Jatah Makan</label>
-                            <input type="number" id="edit-jatah" class="w-full p-3 border rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex gap-3 mt-8">
-                        <button onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 rounded-xl font-bold">Batal</button>
-                        <button onclick="updateStaff()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">Update</button>
-                    </div>
-                </div>
-            </div>
-
-            <section id="sub-laporan" class="admin-subpage">
-                <h2 class="text-2xl font-bold mb-6">Laporan & Biaya</h2>
-                <div class="bg-white p-6 rounded-3xl border mb-6 grid grid-cols-5 gap-4 shadow-sm items-end">
-                    <input type="date" id="filter-date" class="p-3 border rounded-xl text-sm">
-                    <select id="filter-divisi" class="p-3 border rounded-xl text-sm bg-white"></select>
-                    <button onclick="muatLaporan()" class="bg-blue-600 text-white p-3 rounded-xl font-bold text-sm">CARI</button>
-                    <button onclick="exportLaporan()" class="bg-green-600 text-white p-3 rounded-xl font-bold text-sm">CSV</button>
-                    <div class="text-right bg-slate-50 p-2 rounded-xl border border-slate-100">
-                        <div class="text-[9px] text-slate-400 uppercase">Total Biaya</div>
-                        <div id="biaya-terfilter" class="font-bold text-blue-600 text-sm italic">Rp 0</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-3xl border overflow-hidden"><table class="w-full text-left text-sm"><tbody id="report-table-body" class="divide-y"></tbody></table></div>
-            </section>
             
-            </main>
+            <section id="sub-staff" class="admin-subpage hidden">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6">Manajemen Staff</h2>
+                <div class="bg-white p-6 rounded-3xl border mb-6 grid grid-cols-4 gap-4 items-end shadow-sm">
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama</label><input type="text" id="add-nama" class="w-full p-2 border rounded-lg text-sm"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2 border rounded-lg text-sm"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Divisi</label><select id="add-divisi-select" class="w-full p-2 border rounded-lg text-sm bg-white"></select></div>
+                    <button onclick="simpanStaff()" class="bg-slate-900 text-white p-2 rounded-lg font-bold text-sm">TAMBAH</button>
+                </div>
+                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm"><table class="w-full text-left text-sm"><tbody id="staff-table-body" class="divide-y"></tbody></table></div>
+            </section>
+
+            <section id="sub-master-divisi" class="admin-subpage hidden">
+                <h2 class="text-2xl font-bold mb-6">Master Divisi</h2>
+                <div class="bg-white p-6 rounded-3xl border mb-6 flex gap-4 max-w-xl shadow-sm">
+                    <input type="text" id="new-divisi-name" class="flex-1 p-3 border rounded-xl" placeholder="Nama Divisi Baru">
+                    <button onclick="simpanDivisi()" class="bg-blue-600 text-white px-8 rounded-xl font-bold">SIMPAN</button>
+                </div>
+                <div id="divisi-list" class="grid grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="sub-menu-makan" class="admin-subpage hidden">
+                <h2 class="text-2xl font-bold mb-6">Update Menu & Harga</h2>
+                <div class="bg-white p-8 rounded-3xl border max-w-xl shadow-sm space-y-4 text-slate-800">
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Menu</label><textarea id="input-menu-hari-ini" rows="2" class="w-full p-3 border rounded-xl"></textarea></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Harga Per Porsi (Rp)</label><input type="number" id="input-harga-menu" class="w-full p-3 border rounded-xl"></div>
+                    <button onclick="simpanMenu()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-orange-100">SIMPAN MENU</button>
+                </div>
+            </section>
+
+            <section id="sub-laporan" class="admin-subpage hidden">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6">Laporan & Rekap Divisi</h2>
+                <div class="bg-white p-6 rounded-3xl border mb-6 grid grid-cols-4 gap-4 shadow-sm items-end">
+                    <input type="date" id="filter-date" class="p-3 border rounded-xl text-sm">
+                    <button onclick="muatLaporan()" class="bg-blue-600 text-white p-3 rounded-xl font-bold text-sm">TAMPILKAN</button>
+                    <button onclick="exportLaporan()" class="bg-green-600 text-white p-3 rounded-xl font-bold text-sm">EXPORT CSV</button>
+                    <div class="bg-blue-50 p-2 rounded-xl text-center border border-blue-100">
+                        <div class="text-[9px] font-bold text-blue-400 uppercase">Grand Total</div>
+                        <div id="biaya-terfilter" class="font-black text-blue-700">Rp 0</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-3xl border overflow-hidden h-fit"><table class="w-full text-left text-sm"><thead class="bg-slate-50 border-b"><tr><th class="p-4 text-[10px]">DIVISI</th><th class="p-4 text-center text-[10px]">PORSI</th><th class="p-4 text-right text-[10px]">SUBTOTAL</th></tr></thead><tbody id="rekap-divisi-body" class="divide-y"></tbody></table></div>
+                    <div class="lg:col-span-2 bg-white rounded-3xl border overflow-hidden"><table class="w-full text-left text-sm"><thead class="bg-slate-50 border-b"><tr><th class="p-4 text-[10px]">WAKTU</th><th class="p-4 text-[10px]">NAMA STAFF</th><th class="p-4 text-[10px]">DIVISI</th></tr></thead><tbody id="report-table-body" class="divide-y"></tbody></table></div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script>
@@ -129,26 +118,92 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // CORE LOGIC
+        // --- FUNGSI UTAMA (PENTING!) ---
         function showPage(p) {
             if (p === 'admin') {
                 const pass = prompt("🔐 Password Admin:");
-                if (pass !== "kanti123") return alert("Akses Ditolak");
-                document.getElementById('page-admin').style.display = 'flex';
+                if (pass !== "kanti123") return alert("Akses Ditolak!");
+                document.getElementById('page-admin').classList.remove('hidden');
                 document.getElementById('page-scan').classList.add('hidden');
-                switchAdminSubPage('staff');
+                switchAdminSubPage('laporan'); // Default buka laporan
             } else {
-                document.getElementById('page-admin').style.display = 'none';
+                document.getElementById('page-admin').classList.add('hidden');
                 document.getElementById('page-scan').classList.remove('hidden');
-                muatMenuHarianDisplay();
             }
         }
 
-        async function muatMenuHarianDisplay() {
+        function switchAdminSubPage(sub) {
+            // Sembunyikan semua section
+            document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
+            
+            // Tampilkan section yang dipilih
+            const target = document.getElementById('sub-' + sub);
+            if(target) target.classList.remove('hidden');
+
+            // Panggil loader data masing-masing
+            if(sub === 'staff') { muatStaff(); muatDivisiKeDropdown(); }
+            if(sub === 'master-divisi') muatDivisi();
+            if(sub === 'menu-makan') muatMenuHarianInput();
+            if(sub === 'laporan') { document.getElementById('filter-date').valueAsDate = new Date(); muatLaporan(); }
+        }
+
+        // --- MANAJEMEN DATA ---
+        async function muatStaff() {
+            const { data } = await _supabase.from('staff').select('*').order('nama');
+            document.getElementById('staff-table-body').innerHTML = data.map(s => `<tr><td class="p-4"><b>${s.nama}</b><br><small class="text-slate-400">${s.nik}</small></td><td class="p-4 uppercase text-[10px] font-bold">${s.divisi || '-'}</td><td class="p-4 text-right"><button onclick="hapusStaff('${s.nik}')" class="text-red-400 text-xs">HAPUS</button></td></tr>`).join('');
+        }
+        async function simpanStaff() {
+            const n = document.getElementById('add-nama').value; const k = document.getElementById('add-nik').value; const d = document.getElementById('add-divisi-select').value;
+            await _supabase.from('staff').insert([{ nik: k, nama: n, divisi: d }]); muatStaff();
+        }
+        async function hapusStaff(nik) { if(confirm("Hapus?")) { await _supabase.from('staff').delete().eq('nik', nik); muatStaff(); } }
+
+        async function muatDivisi() {
+            const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
+            document.getElementById('divisi-list').innerHTML = data.map(d => `<div class="bg-white p-4 rounded-2xl border flex justify-between items-center"><span class="text-xs font-bold uppercase">${d.nama_divisi}</span><button onclick="hapusDivisi(${d.id})" class="text-red-400 text-[10px] font-bold">HAPUS</button></div>`).join('');
+        }
+        async function simpanDivisi() { 
+            const n = document.getElementById('new-divisi-name').value; 
+            await _supabase.from('master_divisi').insert([{ nama_divisi: n }]); 
+            document.getElementById('new-divisi-name').value = ''; muatDivisi(); 
+        }
+        async function hapusDivisi(id) { await _supabase.from('master_divisi').delete().eq('id', id); muatDivisi(); }
+        async function muatDivisiKeDropdown() {
+            const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
+            document.getElementById('add-divisi-select').innerHTML = data.map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
+        }
+
+        async function muatMenuHarianInput() {
             const tgl = new Date().toISOString().split('T')[0];
             const { data } = await _supabase.from('menu_harian').select('*').eq('tanggal', tgl).single();
-            document.getElementById('display-menu-hari-ini').innerText = data ? data.nama_menu : "Menu Belum Tersedia";
-            // Harga tidak ditampilkan di halaman staff (Hidden)
+            if(data) { document.getElementById('input-menu-hari-ini').value = data.nama_menu; document.getElementById('input-harga-menu').value = data.harga; }
+        }
+        async function simpanMenu() {
+            const menu = document.getElementById('input-menu-hari-ini').value; const harga = document.getElementById('input-harga-menu').value || 0; const tgl = new Date().toISOString().split('T')[0];
+            await _supabase.from('menu_harian').upsert({ tanggal: tgl, nama_menu: menu, harga: harga }, { onConflict: 'tanggal' }); alert("Tersimpan!");
+        }
+
+        async function muatLaporan() {
+            const date = document.getElementById('filter-date').value;
+            const { data: menu } = await _supabase.from('menu_harian').select('harga').eq('tanggal', date).single();
+            const hargaSatuan = menu ? menu.harga : 0;
+            const { data: klaim } = await _supabase.from('laporan_makan').select('*').gte('waktu', `${date}T00:00:00Z`).lte('waktu', `${date}T23:59:59Z`).order('waktu', { ascending: false });
+
+            if(!klaim || klaim.length === 0) {
+                document.getElementById('report-table-body').innerHTML = '<tr><td colspan="3" class="p-8 text-center text-slate-300 italic">Data Kosong</td></tr>';
+                document.getElementById('rekap-divisi-body').innerHTML = '<tr><td colspan="3" class="p-8 text-center text-slate-300 italic">Kosong</td></tr>';
+                document.getElementById('biaya-terfilter').innerText = "Rp 0";
+                return;
+            }
+
+            document.getElementById('report-table-body').innerHTML = klaim.map(l => `<tr><td class="p-4 font-mono text-[11px]">${new Date(l.waktu).toLocaleTimeString()}</td><td class="p-4 font-bold text-slate-700">${l.nama_staff}</td><td class="p-4 uppercase text-[10px] font-bold text-slate-400">${l.divisi || 'N/A'}</td></tr>`).join('');
+
+            const rekap = {};
+            let totalBiaya = 0;
+            klaim.forEach(k => { const d = k.divisi || "N/A"; rekap[d] = (rekap[d] || 0) + 1; totalBiaya += hargaSatuan; });
+
+            document.getElementById('rekap-divisi-body').innerHTML = Object.keys(rekap).map(div => `<tr><td class="p-4 font-bold uppercase text-[10px]">${div}</td><td class="p-4 text-center font-bold text-blue-600">${rekap[div]}</td><td class="p-4 text-right font-black">${formatIDR(rekap[div] * hargaSatuan)}</td></tr>`).join('');
+            document.getElementById('biaya-terfilter').innerText = formatIDR(totalBiaya);
         }
 
         async function prosesKlaim() {
@@ -156,36 +211,29 @@
             const nik = input.value.trim();
             const box = document.getElementById('status-msg');
             if(!nik) return;
-            
             const { data: s } = await _supabase.from('staff').select('*').eq('nik', nik).single();
             box.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-800');
-            
             if(s) {
                 const h = new Date().toISOString().split('T')[0];
                 const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${h}T00:00:00Z`).lte('waktu', `${h}T23:59:59Z`);
-                
                 if(su && su.length >= (s.jatah_makan || 1)) {
-                    box.innerHTML = `⚠️ JATAH HABIS: ${s.nama} sudah makan hari ini.`;
-                    box.className = "p-4 rounded-2xl font-bold bg-yellow-100 text-yellow-800 mb-6 text-center border border-yellow-200";
+                    box.innerHTML = `⚠️ JATAH HABIS: ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-yellow-100 text-yellow-800 mb-6 text-center";
                 } else {
                     await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi }]);
-                    box.innerHTML = `✅ BERHASIL: Selamat makan, ${s.nama}`;
-                    box.className = "p-4 rounded-2xl font-bold bg-green-100 text-green-700 mb-6 text-center border border-green-200";
+                    box.innerHTML = `✅ BERHASIL: Selamat makan, ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-green-100 text-green-700 mb-6 text-center border-2 border-green-200";
                 }
-            } else {
-                box.innerHTML = "❌ NIK TIDAK DITEMUKAN!";
-                box.className = "p-4 rounded-2xl font-bold bg-red-100 text-red-700 mb-6 text-center border border-red-200";
-            }
-            input.value = ''; input.focus();
-            box.classList.remove('hidden'); setTimeout(() => box.classList.add('hidden'), 5000);
+            } else { box.innerHTML = "❌ NIK TIDAK ADA!"; box.className = "p-4 rounded-2xl font-bold bg-red-100 text-red-700 mb-6 text-center"; }
+            input.value = ''; input.focus(); box.classList.remove('hidden'); setTimeout(() => box.classList.add('hidden'), 4000);
         }
 
-        // Support Enter Key
-        document.getElementById('nik-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') prosesKlaim();
-        });
-
-        // (Fungsi Admin lainnya: muatStaff, muatLaporan, etc. tinggal di-copy dari v4.0)
+        document.getElementById('nik-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') prosesKlaim(); });
+        
+        // Init Halaman Depan
+        (async () => {
+            const tgl = new Date().toISOString().split('T')[0];
+            const { data } = await _supabase.from('menu_harian').select('*').eq('tanggal', tgl).single();
+            document.getElementById('display-menu-hari-ini').innerText = data ? data.nama_menu : "Menu Belum Diinput";
+        })();
     </script>
 </body>
 </html>
