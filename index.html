@@ -430,14 +430,40 @@
             }
         }
 
-        function cekStatusRegistrasi() {
-            const isLocked = localStorage.getItem('regis_locked') === 'true';
-            const label = document.getElementById('regis-status-label');
-            const area = document.getElementById('area-daftar-mandiri');
-            label.innerText = isLocked ? 'OFF' : 'ON';
-            label.className = isLocked ? 'text-[8px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded' : 'text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded';
-            if(area) isLocked ? area.classList.add('hidden') : area.classList.remove('hidden');
+       function cekStatusRegistrasi() {
+    // 1. Ambil status dari localStorage
+    const isLocked = localStorage.getItem('regis_locked') === 'true';
+    
+    // 2. Update Label di Sidebar Admin
+    const label = document.getElementById('regis-status-label');
+    if (label) {
+        label.innerText = isLocked ? 'OFF' : 'ON';
+        label.className = isLocked 
+            ? 'text-[8px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded' 
+            : 'text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded';
+    }
+
+    // 3. Sembunyikan/Tampilkan tombol "Daftar ID Baru" di halaman Scan
+    const areaDaftar = document.getElementById('area-daftar-mandiri');
+    if (areaDaftar) {
+        if (isLocked) {
+            areaDaftar.classList.add('hidden'); // Sembunyikan jika OFF
+        } else {
+            areaDaftar.classList.remove('hidden'); // Tampilkan jika ON
         }
+    }
+}
+
+// Pastikan juga fungsi buka modalnya divalidasi ulang
+function openRegisModal() { 
+    const isLocked = localStorage.getItem('regis_locked') === 'true';
+    if(isLocked) {
+        alert("Pendaftaran mandiri telah dinonaktifkan oleh Admin.");
+        return;
+    }
+    muatDivisiKeDropdown('reg-divisi'); 
+    document.getElementById('modal-regis').classList.remove('hidden'); 
+}
 
         function toggleRegisStatus() {
             const isLocked = localStorage.getItem('regis_locked') === 'true';
@@ -535,4 +561,5 @@
     </script>
 </body>
 </html>
+
 
