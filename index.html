@@ -372,13 +372,16 @@
         }
 
         // --- MENU FUNCTIONS ---
-       async function sinkronisasiMenu() {
-    const sekarang = new Date();
-    const tglLokal = sekarang.getFullYear() + '-' + 
-                     String(sekarang.getMonth() + 1).padStart(2, '0') + '-' + 
-                     String(sekarang.getDate()).padStart(2, '0');
+   async function sinkronisasiMenu() {
+    // Ambil tanggal lokal hari ini (Y-m-d)
+    const n = new Date();
+    const tglLokal = n.getFullYear() + '-' + 
+                     String(n.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(n.getDate()).padStart(2, '0');
 
-    const { data } = await _supabase.from('menu_harian')
+    console.log("Mengecek menu untuk tanggal:", tglLokal); // Untuk cek di console
+
+    const { data, error } = await _supabase.from('menu_harian')
         .select('nama_menu')
         .eq('tanggal', tglLokal)
         .maybeSingle();
@@ -388,20 +391,37 @@
         document.getElementById('scan-container').classList.remove('hidden');
         document.getElementById('no-menu-msg').classList.add('hidden');
     } else {
-        document.getElementById('display-menu-hari-ini').innerText = "MENU BELUM DIINPUT";
+        document.getElementById('display-menu-hari-ini').innerText = "MENU BELUM DIINPUT (" + tglLokal + ")";
         document.getElementById('scan-container').classList.add('hidden');
         document.getElementById('no-menu-msg').classList.remove('hidden');
     }
 }
+       async function simpanMenu() {
+    const m = document.getElementById('input-menu-hari-ini').value;
+    const h = document.getElementById('input-harga-menu').value || 0;
+    
+    // Pastikan tanggal yang disimpan adalah tanggal lokal hari ini
+    const n = new Date();
+    const tglLokal = n.getFullYear() + '-' + 
+                     String(n.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(n.getDate()).padStart(2, '0');
 
-        async function simpanMenu() {
-            const m = document.getElementById('input-menu-hari-ini').value;
-            const h = document.getElementById('input-harga-menu').value || 0;
-            const t = new Date().toISOString().split('T')[0];
-            await _supabase.from('menu_harian').upsert({ tanggal: t, nama_menu: m, harga: h }, { onConflict: 'tanggal' });
-            sinkronisasiMenu();
-            alert("Menu Berhasil Diaktifkan");
-        }
+    if(!m) return alert("Isi nama menu!");
+
+    const { error } = await _supabase.from('menu_harian')
+        .upsert({ 
+            tanggal: tglLokal, 
+            nama_menu: m.toUpperCase(), 
+            harga: h 
+        }, { onConflict: 'tanggal' });
+
+    if(!error) {
+        alert("Menu untuk tanggal " + tglLokal + " berhasil diaktifkan!");
+        sinkronisasiMenu();
+    } else {
+        alert("Gagal simpan menu: " + error.message);
+    }
+}
 
         async function hapusMenuHariIni() {
             const t = new Date().toISOString().split('T')[0];
@@ -607,5 +627,6 @@
     </script>
 </body>
 </html>
+
 
 
