@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - ERP v10.0</title>
+    <title>Kanti Delta Spa - ERP v10.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -31,30 +31,70 @@
         }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900 text-xs">
+<body class="bg-[#f8fafc] text-slate-900 text-[11px]">
+
+    <div id="modal-edit" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border">
+            <h3 class="text-lg font-black mb-4 uppercase">✏️ Update Staff</h3>
+            <div class="space-y-3 text-[11px]">
+                <input type="hidden" id="edit-old-nik">
+                <input type="text" id="edit-nama" class="w-full p-3 border rounded-xl font-bold uppercase outline-none" placeholder="Nama Staff">
+                <select id="edit-divisi" class="w-full p-3 border rounded-xl font-bold bg-white"></select>
+                <select id="edit-status" class="w-full p-3 border rounded-xl font-bold bg-white">
+                    <option value="true">✅ STATUS: AKTIF</option>
+                    <option value="false">🚫 STATUS: NON-AKTIF</option>
+                </select>
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 rounded-xl font-bold">BATAL</button>
+                <button onclick="updateStaff()" class="flex-1 py-3 bg-slate-900 text-white rounded-xl font-bold shadow-lg">SIMPAN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-regis" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[200] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl border text-center">
+            <h3 class="text-xl font-black mb-2 text-slate-800 uppercase">Registrasi Staff</h3>
+            <p class="text-[9px] text-slate-400 font-bold mb-6 uppercase tracking-widest italic">Kanti Delta Spa ERP System</p>
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Nama Lengkap</label>
+                    <input type="text" id="reg-nama" class="w-full p-3 border rounded-2xl uppercase font-bold outline-none focus:border-blue-500 text-xs" placeholder="SESUAI KTP">
+                </div>
+                <div>
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Divisi Kerja</label>
+                    <select id="reg-divisi" class="w-full p-3 border rounded-2xl bg-white font-bold text-xs"></select>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeRegisModal()" class="flex-1 py-3 font-bold bg-slate-50 rounded-2xl text-xs uppercase">Batal</button>
+                <button id="btn-submit-regis" onclick="prosesSimpanMandiri()" class="flex-1 py-3 font-bold text-white bg-blue-600 rounded-2xl shadow-lg text-xs uppercase">Daftar</button>
+            </div>
+        </div>
+    </div>
 
     <div id="page-scan" class="h-screen flex flex-col overflow-y-auto">
-        <nav class="bg-white p-4 flex justify-between items-center px-6 border-b sticky top-0 z-50">
-            <h1 class="font-black text-slate-800 text-lg uppercase">Kanti <span class="text-blue-600">Delta Spa</span></h1>
-            <button onclick="showPage('admin')" class="text-[10px] font-black text-slate-400 border px-4 py-1.5 rounded-full uppercase">Admin Login</button>
+        <nav class="bg-white p-4 flex justify-between items-center px-6 border-b sticky top-0 z-50 shadow-sm">
+            <h1 class="font-black text-slate-800 text-lg uppercase tracking-tighter italic">Kanti <span class="text-blue-600 italic">Delta Spa</span></h1>
+            <button onclick="showPage('admin')" class="text-[9px] font-black text-slate-400 border px-4 py-2 rounded-full uppercase hover:bg-slate-50 transition-all">Admin Login</button>
         </nav>
         
-        <main class="flex-1 flex flex-col items-center justify-center p-4 space-y-6">
+        <main class="flex-1 flex flex-col items-center justify-center p-6 space-y-6">
             <div class="text-center">
-                <div id="clock" class="digital-clock text-5xl font-bold text-slate-800">00:00:00</div>
-                <div id="date-display" class="text-[10px] font-black text-blue-500 uppercase mt-2 tracking-widest">Memuat...</div>
+                <div id="clock" class="digital-clock text-6xl font-black text-slate-800">00:00:00</div>
+                <div id="date-display" class="text-[10px] font-black text-blue-500 uppercase mt-2 tracking-widest italic">Memuat Tanggal...</div>
             </div>
 
-            <div class="bg-amber-50 border border-amber-100 p-4 rounded-3xl w-full max-w-xs text-center shadow-sm">
-                <p id="display-menu-hari-ini" class="text-lg font-black text-slate-800 italic uppercase">STANDBY...</p>
+            <div class="bg-amber-50 border border-amber-100 p-4 rounded-[2rem] w-full max-w-xs text-center shadow-sm">
+                <p id="display-menu-hari-ini" class="text-base font-black text-slate-800 italic uppercase">STANDBY...</p>
             </div>
 
-            <div id="scan-container" class="hidden max-w-xs w-full bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-50 text-center">
-                <div id="status-msg" class="hidden p-3 rounded-xl font-bold text-[11px] mb-4 border"></div>
-                <input type="text" id="nik-input" autofocus placeholder="ID STAFF" class="w-full p-4 border-2 border-slate-100 rounded-2xl text-center text-2xl font-black uppercase focus:border-blue-500 mb-4 outline-none">
-                <button onclick="prosesKlaim()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg uppercase tracking-widest mb-4">Klaim Makan</button>
+            <div id="scan-container" class="hidden max-w-xs w-full bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-50 text-center">
+                <div id="status-msg" class="hidden p-3 rounded-xl font-bold text-[11px] mb-4 border shadow-inner"></div>
+                <input type="text" id="nik-input" autofocus placeholder="ID STAFF" class="w-full p-4 border-2 border-slate-100 rounded-2xl text-center text-3xl font-black uppercase focus:border-blue-500 mb-4 outline-none transition-all placeholder:text-slate-200">
+                <button onclick="prosesKlaim()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 uppercase tracking-widest mb-6">KLAIM MAKAN</button>
                 <div id="area-daftar-mandiri">
-                    <button onclick="openRegisModal()" class="text-blue-600 font-bold text-[10px] uppercase">Daftar ID Baru</button>
+                    <button onclick="openRegisModal()" class="text-blue-600 font-bold text-[10px] uppercase hover:underline">Daftar ID Baru</button>
                 </div>
             </div>
         </main>
@@ -64,111 +104,171 @@
         <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col h-full shadow-2xl">
             <div class="p-6 border-b border-slate-800 flex items-center gap-3">
                 <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-slate-900 font-black italic">K</div>
-                <span class="font-black text-sm uppercase text-amber-400">Admin Kanti</span>
+                <span class="font-black text-sm uppercase text-amber-400 tracking-tighter italic">Admin System</span>
             </div>
             <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scroll">
-                <button id="nav-dashboard" onclick="switchAdminSubPage('dashboard')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-slate-400">📊 Dashboard</button>
-                <button id="nav-staff" onclick="switchAdminSubPage('staff')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-slate-400">👥 Data Staff</button>
-                <button id="nav-master-divisi" onclick="switchAdminSubPage('master-divisi')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-slate-400">🏢 Master Divisi</button>
-                <button id="nav-menu-makan" onclick="switchAdminSubPage('menu-makan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-orange-400">🍱 Update Menu</button>
-                <button id="nav-laporan-scan" onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-emerald-400">📜 Laporan Scan</button>
-                <button id="nav-laporan-detail" onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold text-blue-400">💰 Rekap Biaya</button>
+                <button id="nav-dashboard" onclick="switchAdminSubPage('dashboard')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex items-center gap-2 text-slate-400">📊 DASHBOARD</button>
+                <button id="nav-staff" onclick="switchAdminSubPage('staff')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex items-center gap-2 text-slate-400">👥 DATA STAFF</button>
+                <button id="nav-master-divisi" onclick="switchAdminSubPage('master-divisi')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex items-center gap-2 text-slate-400 text-emerald-400">🏢 DIVISI KERJA</button>
+                <button id="nav-menu-makan" onclick="switchAdminSubPage('menu-makan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex items-center gap-2 text-orange-400 uppercase">🍱 Update Menu</button>
+                <button id="nav-laporan-scan" onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex items-center gap-2 text-emerald-400 uppercase text-[10px]">📜 Laporan Harian</button>
+                <button id="nav-laporan-detail" onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex items-center gap-2 text-blue-400 uppercase text-[10px]">💰 Rekap Bulanan</button>
+                
                 <div class="pt-4 mt-4 border-t border-slate-800 text-[10px]">
-                    <button onclick="toggleRegisStatus()" class="w-full p-3 hover:bg-slate-800 rounded-xl font-bold flex justify-between text-slate-400">
-                        <span>🔑 Registrasi</span> <span id="regis-status-label" class="bg-emerald-500/20 text-emerald-400 px-2 rounded">ON</span>
+                    <button id="btn-toggle-regis" onclick="toggleRegisStatus()" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex justify-between items-center text-slate-400 uppercase">
+                        <span>🔑 Registrasi Staff</span>
+                        <span id="regis-status-label" class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[8px]">ON</span>
                     </button>
-                    <button onclick="resetAllData()" class="w-full p-3 text-red-500 font-bold uppercase">🔥 Reset Data</button>
+                    <button onclick="resetAllData()" class="w-full text-left p-3 text-red-500 hover:bg-red-500/10 rounded-xl font-bold uppercase mt-2">🔥 Reset Database</button>
                 </div>
             </nav>
             <div class="p-4 border-t border-slate-800">
-                <button onclick="showPage('scan')" class="w-full p-3 bg-red-600 text-white rounded-xl font-black uppercase text-[10px]">Logout</button>
+                <button onclick="showPage('scan')" class="w-full p-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black uppercase text-[10px] shadow-lg">KELUAR ADMIN</button>
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-6 custom-scroll">
+        <main class="flex-1 overflow-y-auto p-8 custom-scroll">
+            
             <section id="sub-dashboard" class="admin-subpage hidden">
-                <h2 class="text-xl font-black mb-6 uppercase">Dashboard</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-white p-5 rounded-3xl border">
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Scan Hari Ini</p>
-                        <h3 id="stat-total-scan" class="text-3xl font-black text-blue-600">0</h3>
+                <h2 class="text-2xl font-black uppercase mb-8 italic">Dashboard Statistik</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Scan Hari Ini</p>
+                        <h3 id="stat-total-scan" class="text-4xl font-black text-blue-600 italic">0</h3>
                     </div>
-                    <div class="bg-white p-5 rounded-3xl border">
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Estimasi Biaya</p>
-                        <h3 id="stat-total-biaya" class="text-2xl font-black text-slate-800">Rp 0</h3>
+                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estimasi Pengeluaran</p>
+                        <h3 id="stat-total-biaya" class="text-3xl font-black text-slate-800 italic">Rp 0</h3>
                     </div>
+                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Staff Aktif</p>
+                        <h3 id="stat-total-staff" class="text-3xl font-black text-emerald-500 italic">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-[2rem] border shadow-sm">
+                    <canvas id="chart-makan" height="100"></canvas>
                 </div>
             </section>
 
             <section id="sub-staff" class="admin-subpage hidden">
-                <h2 class="text-xl font-black uppercase mb-6">Database Staff</h2>
-                <div class="bg-white rounded-3xl border overflow-hidden">
-                    <table class="w-full text-left text-[10px]">
-                        <thead class="bg-slate-50 border-b"><tr><th class="p-4">NIK</th><th class="p-4">NAMA</th><th class="p-4">DIVISI</th></tr></thead>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black uppercase italic">Database Staff</h2>
+                    <button onclick="muatStaff()" class="bg-white border px-4 py-2 rounded-xl font-bold text-[10px] uppercase shadow-sm">🔄 Refresh</button>
+                </div>
+                <div class="bg-white rounded-[2rem] border overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-slate-50 border-b text-slate-400 font-black uppercase italic">
+                            <tr><th class="p-5">NIK ID</th><th class="p-5">NAMA STAFF</th><th class="p-5">DIVISI</th><th class="p-5">STATUS</th><th class="p-5">AKSI</th></tr>
+                        </thead>
                         <tbody id="staff-table-body" class="divide-y"></tbody>
                     </table>
                 </div>
             </section>
 
+            <section id="sub-master-divisi" class="admin-subpage hidden">
+                <h2 class="text-2xl font-black uppercase mb-8 italic">Manajemen Divisi</h2>
+                <div class="bg-white p-6 rounded-[2rem] border mb-8 max-w-sm shadow-sm">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Tambah Divisi Baru</label>
+                    <div class="flex gap-2 mt-2">
+                        <input type="text" id="input-divisi" class="flex-1 p-3 border rounded-xl font-bold uppercase outline-none focus:border-emerald-500" placeholder="Contoh: SPA THERAPIST">
+                        <button onclick="simpanDivisi()" class="bg-emerald-500 text-white px-5 rounded-xl font-black uppercase text-[10px]">SIMPAN</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-[2rem] border overflow-hidden shadow-sm max-w-md">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-slate-50 border-b font-black text-slate-400 uppercase italic">
+                            <tr><th class="p-5">Nama Divisi</th><th class="p-5 text-center">Hapus</th></tr>
+                        </thead>
+                        <tbody id="divisi-table-body" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </section>
+
             <section id="sub-menu-makan" class="admin-subpage hidden">
-                <h2 class="text-xl font-black uppercase mb-6 text-orange-600">Update Menu Harian</h2>
-                <div class="bg-white p-6 rounded-3xl border max-w-sm space-y-4">
-                    <textarea id="input-menu-hari-ini" rows="2" class="w-full p-3 border rounded-xl font-black text-sm uppercase" placeholder="Nama Menu..."></textarea>
-                    <input type="number" id="input-harga-menu" class="w-full p-3 border rounded-xl font-black text-sm" placeholder="Harga (Contoh: 15000)">
-                    <button onclick="simpanMenu()" class="w-full bg-orange-500 text-white py-3 rounded-xl font-black uppercase">Aktifkan Menu</button>
+                <h2 class="text-2xl font-black uppercase mb-8 text-orange-600 italic">🍱 Update Menu Harian</h2>
+                <div class="bg-white p-8 rounded-[2rem] border max-w-md shadow-sm space-y-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">Nama Menu Hari Ini</label>
+                        <textarea id="input-menu-hari-ini" rows="2" class="w-full p-4 border rounded-2xl font-black text-sm uppercase outline-none focus:border-orange-400 mt-1 shadow-inner bg-slate-50" placeholder="MASUKKAN MENU..."></textarea>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">Harga Per Porsi</label>
+                        <input type="number" id="input-harga-menu" class="w-full p-4 border rounded-2xl font-black text-sm outline-none focus:border-orange-400 mt-1 bg-slate-50" placeholder="Rp 15000">
+                    </div>
+                    <button onclick="simpanMenu()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black uppercase shadow-lg shadow-orange-200 active:scale-95 transition-all mt-4 tracking-widest">AKTIFKAN MENU SEKARANG</button>
+                </div>
+            </section>
+
+            <section id="sub-laporan-scan" class="admin-subpage hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black uppercase italic text-emerald-600">Laporan Scan Harian</h2>
+                    <button onclick="cetakPDF('harian')" class="bg-emerald-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-emerald-100">Cetak PDF</button>
+                </div>
+                <div class="bg-white p-5 rounded-[2rem] border grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 shadow-sm items-end">
+                    <input type="date" id="filter-tgl-harian" class="p-3 border rounded-xl font-bold text-[11px] outline-none">
+                    <select id="filter-divisi-harian" class="p-3 border rounded-xl font-bold text-[11px] bg-white"></select>
+                    <button onclick="muatLaporanHarian()" class="bg-slate-900 text-white py-3 rounded-xl font-black uppercase text-[10px]">Tampilkan Data</button>
+                </div>
+                <div class="bg-white rounded-[2rem] border overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-slate-50 border-b font-black text-slate-400 uppercase italic">
+                            <tr><th class="p-5">Waktu</th><th class="p-5 text-center">ID Staff</th><th class="p-5">Nama</th><th class="p-5">Divisi</th><th class="p-5 text-center">Aksi</th></tr>
+                        </thead>
+                        <tbody id="harian-table-body" class="divide-y"></tbody>
+                    </table>
                 </div>
             </section>
 
             <section id="sub-laporan-detail" class="admin-subpage hidden">
-                <h2 class="text-xl font-black uppercase text-blue-600 mb-6">Rekap Biaya Bulanan</h2>
-                <div class="bg-white p-4 rounded-3xl border grid grid-cols-3 gap-3 mb-6 items-end">
-                    <input type="month" id="rekap-bulan" class="p-2 border rounded-xl font-bold text-[11px]">
-                    <select id="det-filter-divisi" class="p-2 border rounded-xl bg-slate-50 font-bold text-[11px]"></select>
-                    <button onclick="muatRekapBulanan()" class="bg-blue-600 text-white p-2 rounded-xl font-black uppercase text-[10px]">Hitung Rekap</button>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black uppercase italic text-blue-600">Rekap Biaya Bulanan</h2>
+                    <button onclick="cetakPDF('bulanan')" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-blue-100">Cetak Laporan</button>
                 </div>
-                <div class="bg-white rounded-3xl border overflow-hidden">
-                    <table class="w-full text-left text-[10px]">
-                        <thead class="bg-slate-50 font-black border-b text-slate-400">
-                            <tr><th class="p-4">Nama</th><th class="text-center">Total</th><th class="text-right p-4">Biaya</th></tr>
+                <div class="bg-white p-5 rounded-[2rem] border grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 shadow-sm items-end">
+                    <div>
+                        <label class="text-[9px] font-bold text-slate-400 ml-1">Pilih Bulan & Tahun</label>
+                        <input type="month" id="rekap-bulan" class="w-full p-3 border rounded-xl font-bold text-[11px] outline-none mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold text-slate-400 ml-1">Filter Per Divisi</label>
+                        <select id="det-filter-divisi" class="w-full p-3 border rounded-xl bg-white font-bold text-[11px] outline-none mt-1"></select>
+                    </div>
+                    <button onclick="muatRekapBulanan()" class="bg-blue-600 text-white py-3 rounded-xl font-black uppercase text-[10px] shadow-lg">HITUNG REKAP</button>
+                </div>
+                <div class="bg-white rounded-[2rem] border overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-slate-50 border-b font-black text-slate-400 uppercase italic">
+                            <tr><th class="p-5">Nama Staff</th><th class="p-5 text-center">Total Klaim</th><th class="p-5 text-right">Estimasi Biaya</th></tr>
                         </thead>
                         <tbody id="detail-table-body" class="divide-y"></tbody>
                     </table>
                 </div>
             </section>
+
         </main>
     </div>
 
-    <div id="modal-regis" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl text-center">
-            <h3 class="text-xl font-black mb-4">Registrasi Staff</h3>
-            <input type="text" id="reg-nama" class="w-full p-3 border rounded-2xl uppercase mb-3 font-bold" placeholder="Nama Lengkap">
-            <select id="reg-divisi" class="w-full p-3 border rounded-2xl mb-6 font-bold"></select>
-            <div class="flex gap-3">
-                <button onclick="closeRegisModal()" class="flex-1 py-3 bg-slate-50 rounded-2xl font-bold">Batal</button>
-                <button id="btn-submit-regis" onclick="prosesSimpanMandiri()" class="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Daftar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="struk-print" class="hidden text-black">
-        <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 5px;">
+    <div id="struk-print" class="hidden text-black text-center">
+        <div style="border-bottom: 1px dashed #000; padding-bottom: 5px;">
             <h2 style="font-size: 14px; margin: 0; font-weight: bold;">KANTI DELTA SPA</h2>
-            <p style="font-size: 9px; margin: 0;">Bukti Klaim Makan</p>
+            <p style="font-size: 9px; margin: 0;">BUKTI KLAIM MAKAN</p>
         </div>
-        <div style="font-size: 10px; padding: 10px 0; line-height: 1.5;">
-            <p>Tanggal: <span id="p-tgl"></span></p>
-            <p>Jam   : <span id="p-jam"></span></p>
-            <p>Nama  : <span id="p-nama"></span></p>
-            <p>Divisi: <span id="p-divisi"></span></p>
+        <div style="font-size: 10px; padding: 10px 0; line-height: 1.6; text-align: left;">
+            <p>Tanggal : <span id="p-tgl"></span></p>
+            <p>Jam     : <span id="p-jam"></span></p>
+            <hr style="border: 0.5px solid #eee; margin: 5px 0;">
+            <p>NAMA    : <span id="p-nama" style="font-weight: bold;"></span></p>
+            <p>DIVISI  : <span id="p-divisi"></span></p>
         </div>
         <div style="text-align: center; border-top: 1px dashed #000; padding-top: 5px;">
             <p style="font-size: 8px;">TERIMA KASIH</p>
+            <p style="font-size: 7px; color: #777;">ERP System v10.1</p>
         </div>
     </div>
 
     <script>
-        // --- KONFIGURASI SUPABASE ---
-       const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        // --- KONFIGURASI SUPABASE (ISI DENGAN DATA ANDA) ---
+      const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -193,7 +293,6 @@
         async function switchAdminSubPage(sub) {
             document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('aside nav button').forEach(b => b.classList.remove('active-nav'));
-            
             const target = document.getElementById('sub-' + sub);
             if(target) target.classList.remove('hidden');
             const navBtn = document.getElementById('nav-' + sub); 
@@ -201,13 +300,98 @@
 
             if(sub === 'dashboard') muatDashboard();
             if(sub === 'staff') muatStaff();
-            if(sub === 'laporan-detail') { 
-                muatDivisiKeDropdown('det-filter-divisi', true);
+            if(sub === 'master-divisi') muatDivisi();
+            if(sub === 'laporan-scan') {
+                document.getElementById('filter-tgl-harian').value = new Date().toISOString().split('T')[0];
+                muatDivisiKeDropdown('filter-divisi-harian', true);
+                muatLaporanHarian();
+            }
+            if(sub === 'laporan-detail') {
                 document.getElementById('rekap-bulan').value = new Date().toISOString().slice(0, 7);
+                muatDivisiKeDropdown('det-filter-divisi', true);
+                muatRekapBulanan();
             }
         }
 
-        // --- FUNGSI SCAN & PRINT ---
+        // --- MANAJEMEN STAFF ---
+        async function muatStaff() {
+            const { data } = await _supabase.from('staff').select('*').order('nama');
+            const body = document.getElementById('staff-table-body');
+            body.innerHTML = (data || []).map(s => `
+                <tr class="hover:bg-slate-50 transition-all">
+                    <td class="p-5 font-bold">${s.nik}</td>
+                    <td class="p-5 font-black uppercase text-slate-800">${s.nama}</td>
+                    <td class="p-5 text-slate-500">${s.divisi}</td>
+                    <td class="p-5">${s.is_active ? '<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded">AKTIF</span>' : '<span class="text-rose-500 font-bold bg-rose-50 px-2 py-1 rounded">NON-AKTIF</span>'}</td>
+                    <td class="p-5">
+                        <button onclick="openEditModal('${s.nik}', '${s.nama}', '${s.divisi}', ${s.is_active})" class="bg-slate-100 p-2 rounded-lg font-bold text-[9px] uppercase">EDIT</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openEditModal(nik, nama, divisi, status) {
+            document.getElementById('edit-old-nik').value = nik;
+            document.getElementById('edit-nama').value = nama;
+            document.getElementById('edit-status').value = status.toString();
+            muatDivisiKeDropdown('edit-divisi');
+            setTimeout(() => { document.getElementById('edit-divisi').value = divisi; }, 200);
+            document.getElementById('modal-edit').classList.remove('hidden');
+        }
+
+        function closeEditModal() { document.getElementById('modal-edit').classList.add('hidden'); }
+
+        async function updateStaff() {
+            const nik = document.getElementById('edit-old-nik').value;
+            const nama = document.getElementById('edit-nama').value.toUpperCase();
+            const div = document.getElementById('edit-divisi').value;
+            const stat = document.getElementById('edit-status').value === 'true';
+            await _supabase.from('staff').update({ nama: nama, divisi: div, is_active: stat }).eq('nik', nik);
+            alert("Data Updated!"); closeEditModal(); muatStaff();
+        }
+
+        // --- MANAJEMEN DIVISI ---
+        async function muatDivisi() {
+            const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
+            document.getElementById('divisi-table-body').innerHTML = (data || []).map(d => `
+                <tr><td class="p-5 font-bold uppercase">${d.nama_divisi}</td><td class="p-5 text-center"><button onclick="hapusDivisi(${d.id})" class="text-rose-500 font-black">✕</button></td></tr>
+            `).join('');
+        }
+
+        async function simpanDivisi() {
+            const val = document.getElementById('input-divisi').value.toUpperCase();
+            if(!val) return;
+            await _supabase.from('master_divisi').insert([{ nama_divisi: val }]);
+            document.getElementById('input-divisi').value = ''; muatDivisi();
+        }
+
+        async function hapusDivisi(id) {
+            if(!confirm("Hapus divisi?")) return;
+            await _supabase.from('master_divisi').delete().eq('id', id);
+            muatDivisi();
+        }
+
+        async function muatDivisiKeDropdown(targetId, includeAll = false) {
+            const { data } = await _supabase.from('master_divisi').select('nama_divisi').order('nama_divisi');
+            let html = includeAll ? '<option value="SEMUA">-- SEMUA DIVISI --</option>' : '';
+            html += (data || []).map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
+            document.getElementById(targetId).innerHTML = html;
+        }
+
+        // --- CORE LOGIC: SCAN, PRINT, MENU ---
+        async function sinkronisasiMenu() {
+            const n = new Date();
+            const tglLokal = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+            const { data } = await _supabase.from('menu_harian').select('nama_menu').eq('tanggal', tglLokal).maybeSingle();
+            if (data) {
+                document.getElementById('display-menu-hari-ini').innerText = data.nama_menu;
+                document.getElementById('scan-container').classList.remove('hidden');
+            } else {
+                document.getElementById('display-menu-hari-ini').innerText = "BELUM INPUT MENU (" + tglLokal + ")";
+                document.getElementById('scan-container').classList.add('hidden');
+            }
+        }
+
         async function prosesKlaim() {
             const input = document.getElementById('nik-input');
             const nik = input.value.trim().toUpperCase();
@@ -223,10 +407,8 @@
                 if(!errInsert) {
                     box.innerText = "✅ BERHASIL: " + s.nama;
                     box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold border border-emerald-100 text-center";
-                    
-                    const skrg = new Date();
-                    document.getElementById('p-tgl').innerText = skrg.toLocaleDateString('id-ID');
-                    document.getElementById('p-jam').innerText = skrg.toLocaleTimeString('id-ID');
+                    document.getElementById('p-tgl').innerText = new Date().toLocaleDateString('id-ID');
+                    document.getElementById('p-jam').innerText = new Date().toLocaleTimeString('id-ID');
                     document.getElementById('p-nama').innerText = s.nama;
                     document.getElementById('p-divisi').innerText = s.divisi;
                     setTimeout(() => { window.print(); }, 500);
@@ -242,34 +424,61 @@
             setTimeout(() => box.classList.add('hidden'), 4000);
         }
 
-        // --- FUNGSI MENU & REGISTRASI ---
-        async function sinkronisasiMenu() {
+        async function simpanMenu() {
+            const m = document.getElementById('input-menu-hari-ini').value;
+            const h = document.getElementById('input-harga-menu').value || 0;
             const n = new Date();
-            const tglLokal = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
-            const { data } = await _supabase.from('menu_harian').select('nama_menu').eq('tanggal', tglLokal).maybeSingle();
-            if (data) {
-                document.getElementById('display-menu-hari-ini').innerText = data.nama_menu;
-                document.getElementById('scan-container').classList.remove('hidden');
-            } else {
-                document.getElementById('display-menu-hari-ini').innerText = "STANDBY (" + tglLokal + ")";
-                document.getElementById('scan-container').classList.add('hidden');
-            }
+            const tgl = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+            await _supabase.from('menu_harian').upsert({ tanggal: tgl, nama_menu: m.toUpperCase(), harga: h }, { onConflict: 'tanggal' });
+            alert("MENU DIAKTIFKAN!"); sinkronisasiMenu();
         }
 
+        // --- REGISTRASI MANDIRI ---
         async function openRegisModal() {
             const { data } = await _supabase.from('settings').select('value').eq('key', 'is_regis_enabled').maybeSingle();
-            if (data && data.value === false) return alert("Registrasi Ditutup.");
+            if (data && data.value === false) return alert("Pendaftaran mandiri sedang ditutup oleh Admin.");
             muatDivisiKeDropdown('reg-divisi');
             document.getElementById('modal-regis').classList.remove('hidden');
         }
 
         function closeRegisModal() { document.getElementById('modal-regis').classList.add('hidden'); }
 
-        async function muatDivisiKeDropdown(targetId, includeAll = false) {
-            const { data } = await _supabase.from('master_divisi').select('nama_divisi');
-            let html = includeAll ? '<option value="SEMUA">-- SEMUA --</option>' : '';
-            html += (data || []).map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
-            document.getElementById(targetId).innerHTML = html;
+        async function prosesSimpanMandiri() {
+            const btn = document.getElementById('btn-submit-regis');
+            const n = document.getElementById('reg-nama').value.trim();
+            const d = document.getElementById('reg-divisi').value;
+            if(!n) return alert("Isi Nama!");
+            btn.disabled = true;
+            const { data, error } = await _supabase.from('staff').insert([{ nama: n.toUpperCase(), divisi: d, is_active: true }]).select();
+            if(!error) { alert("Daftar Berhasil!\nID ANDA: " + data[0].nik); closeRegisModal(); }
+            btn.disabled = false;
+        }
+
+        async function toggleRegisStatus() {
+            const cur = document.getElementById('regis-status-label').innerText === 'ON';
+            await _supabase.from('settings').upsert({ key: 'is_regis_enabled', value: !cur }, { onConflict: 'key' });
+            cekStatusRegistrasi();
+        }
+
+        async function cekStatusRegistrasi() {
+            const { data } = await _supabase.from('settings').select('value').eq('key', 'is_regis_enabled').maybeSingle();
+            const isEnabled = data ? data.value : true;
+            const label = document.getElementById('regis-status-label');
+            label.innerText = isEnabled ? 'ON' : 'OFF';
+            label.className = isEnabled ? 'bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[8px]' : 'bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded text-[8px]';
+            document.getElementById('area-daftar-mandiri').className = isEnabled ? 'block' : 'hidden';
+        }
+
+        // --- LAPORAN & REKAP ---
+        async function muatLaporanHarian() {
+            const tgl = document.getElementById('filter-tgl-harian').value;
+            const div = document.getElementById('filter-divisi-harian').value;
+            let qs = _supabase.from('laporan_makan').select('*').gte('waktu', `${tgl}T00:00:00`).lte('waktu', `${tgl}T23:59:59`);
+            if(div !== 'SEMUA') qs = qs.eq('divisi', div);
+            const { data } = await qs.order('waktu', { ascending: false });
+            document.getElementById('harian-table-body').innerHTML = (data || []).map(l => `
+                <tr><td class="p-5">${new Date(l.waktu).toLocaleTimeString('id-ID')}</td><td class="p-5 text-center">${l.nik_staff}</td><td class="p-5 font-bold uppercase">${l.nama_staff}</td><td class="p-5">${l.divisi}</td><td class="p-5 text-center"><button onclick="hapusLaporan(${l.id})" class="text-rose-500 font-bold">HAPUS</button></td></tr>
+            `).join('');
         }
 
         async function muatRekapBulanan() {
@@ -282,34 +491,29 @@
             const { data: staffs } = await qs.order('nama');
             document.getElementById('detail-table-body').innerHTML = (staffs || []).map(s => {
                 const total = (klaims || []).filter(k => k.nik_staff === s.nik).length;
-                return `<tr><td class="p-4 uppercase">${s.nama}</td><td class="text-center">${total}x</td><td class="text-right p-4 font-bold text-blue-600">${formatIDR(total * 15000)}</td></tr>`;
+                return `<tr><td class="p-5 font-bold uppercase">${s.nama}</td><td class="p-5 text-center font-black">${total}x</td><td class="p-5 text-right font-bold text-blue-600">${formatIDR(total * 15000)}</td></tr>`;
             }).join('');
         }
 
-        async function muatStaff() {
-            const { data } = await _supabase.from('staff').select('*').order('nama');
-            document.getElementById('staff-table-body').innerHTML = (data || []).map(s => `<tr><td class="p-4">${s.nik}</td><td class="p-4 font-bold uppercase">${s.nama}</td><td class="p-4">${s.divisi}</td></tr>`).join('');
+        async function muatDashboard() {
+            const tgl = new Date().toISOString().split('T')[0];
+            const { data: klaims } = await _supabase.from('laporan_makan').select('*').gte('waktu', `${tgl}T00:00:00`);
+            const { count } = await _supabase.from('staff').select('*', { count: 'exact', head: true }).eq('is_active', true);
+            document.getElementById('stat-total-scan').innerText = klaims.length;
+            document.getElementById('stat-total-biaya').innerText = formatIDR(klaims.length * 15000);
+            document.getElementById('stat-total-staff').innerText = count;
         }
 
-        async function simpanMenu() {
-            const m = document.getElementById('input-menu-hari-ini').value;
-            const h = document.getElementById('input-harga-menu').value || 0;
-            const n = new Date();
-            const tgl = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
-            await _supabase.from('menu_harian').upsert({ tanggal: tgl, nama_menu: m.toUpperCase(), harga: h });
-            alert("Menu Berhasil Diaktifkan");
-            sinkronisasiMenu();
-        }
-
-        // --- CLOCK ---
+        // --- CLOCK & AUTO SYNC ---
         function updateClock() {
             const n = new Date();
             document.getElementById('clock').innerText = n.toLocaleTimeString('id-ID', { hour12: false });
-            document.getElementById('date-display').innerText = n.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+            document.getElementById('date-display').innerText = n.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
         }
 
         setInterval(updateClock, 1000);
-        updateClock(); sinkronisasiMenu();
+        setInterval(cekStatusRegistrasi, 30000);
+        updateClock(); sinkronisasiMenu(); cekStatusRegistrasi();
     </script>
 </body>
 </html>
