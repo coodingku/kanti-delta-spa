@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - ERP v4.3</title>
+    <title>Kanti Delta Spa - ERP v4.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
@@ -40,10 +40,10 @@
     </div>
 
     <div id="page-admin" class="hidden min-h-screen bg-slate-50 flex overflow-hidden">
-        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col">
+        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl">
             <div class="p-8">
-                <h2 class="text-xl font-bold text-blue-400 tracking-tighter">KANTI ADMIN</h2>
-                <p class="text-[9px] text-slate-500 uppercase tracking-widest">Version 4.3</p>
+                <h2 class="text-xl font-bold text-blue-400 tracking-tighter uppercase">Admin Panel</h2>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest">ERP Version 4.4</p>
             </div>
             <nav class="flex-1 px-4 space-y-1 text-sm font-medium">
                 <button onclick="switchAdminSubPage('staff')" class="w-full text-left flex items-center p-3.5 hover:bg-slate-800 rounded-xl transition">👥 Manajemen Staff</button>
@@ -59,10 +59,10 @@
             <section id="sub-staff" class="admin-subpage hidden">
                 <h2 class="text-2xl font-bold text-slate-800 mb-6">Manajemen Staff</h2>
                 <div class="bg-white p-6 rounded-3xl border mb-6 grid grid-cols-4 gap-4 items-end shadow-sm">
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama</label><input type="text" id="add-nama" class="w-full p-2 border rounded-lg text-sm"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2 border rounded-lg text-sm"></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Divisi</label><select id="add-divisi-select" class="w-full p-2 border rounded-lg text-sm bg-white"></select></div>
-                    <button onclick="simpanStaff()" class="bg-slate-900 text-white p-2 rounded-lg font-bold text-sm">TAMBAH</button>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama</label><input type="text" id="add-nama" class="w-full p-2 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2 border rounded-lg text-sm outline-none"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Divisi</label><select id="add-divisi-select" class="w-full p-2 border rounded-lg text-sm bg-white outline-none"></select></div>
+                    <button onclick="simpanStaff()" class="bg-slate-900 text-white p-2.5 rounded-lg font-bold text-sm hover:bg-blue-600 transition">TAMBAH STAFF</button>
                 </div>
                 <div class="bg-white rounded-3xl border overflow-hidden shadow-sm"><table class="w-full text-left text-sm"><tbody id="staff-table-body" class="divide-y"></tbody></table></div>
             </section>
@@ -70,47 +70,61 @@
             <section id="sub-master-divisi" class="admin-subpage hidden">
                 <h2 class="text-2xl font-bold mb-6">Master Divisi</h2>
                 <div class="bg-white p-6 rounded-3xl border mb-6 flex gap-4 max-w-xl shadow-sm">
-                    <input type="text" id="new-divisi-name" class="flex-1 p-3 border rounded-xl" placeholder="Nama Divisi Baru">
-                    <button onclick="simpanDivisi()" class="bg-blue-600 text-white px-8 rounded-xl font-bold">SIMPAN</button>
+                    <input type="text" id="new-divisi-name" class="flex-1 p-3 border rounded-xl outline-none" placeholder="Nama Divisi Baru">
+                    <button onclick="simpanDivisi()" class="bg-blue-600 text-white px-8 rounded-xl font-bold hover:bg-blue-700 transition">SIMPAN</button>
                 </div>
                 <div id="divisi-list" class="grid grid-cols-3 gap-4"></div>
             </section>
 
             <section id="sub-menu-makan" class="admin-subpage hidden">
                 <h2 class="text-2xl font-bold mb-6">Update Menu & Harga</h2>
-                <div class="bg-white p-8 rounded-3xl border max-w-xl shadow-sm space-y-4 text-slate-800">
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Menu</label><textarea id="input-menu-hari-ini" rows="2" class="w-full p-3 border rounded-xl"></textarea></div>
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Harga Per Porsi (Rp)</label><input type="number" id="input-harga-menu" class="w-full p-3 border rounded-xl"></div>
-                    <button onclick="simpanMenu()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-orange-100">SIMPAN MENU</button>
+                <div class="bg-white p-8 rounded-3xl border max-w-xl shadow-sm space-y-4">
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama Menu</label><textarea id="input-menu-hari-ini" rows="2" class="w-full p-3 border rounded-xl outline-none" placeholder="Contoh: Nasi Goreng Spesial"></textarea></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Harga Per Porsi (Rp)</label><input type="number" id="input-harga-menu" class="w-full p-3 border rounded-xl outline-none" placeholder="15000"></div>
+                    <button onclick="simpanMenu()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-orange-100 hover:bg-orange-600 transition">SIMPAN PENGATURAN</button>
                 </div>
             </section>
 
             <section id="sub-laporan" class="admin-subpage hidden">
                 <h2 class="text-2xl font-bold text-slate-800 mb-6">Laporan & Rekap Divisi</h2>
-                <div class="bg-white p-6 rounded-3xl border mb-6 grid grid-cols-4 gap-4 shadow-sm items-end">
-                    <input type="date" id="filter-date" class="p-3 border rounded-xl text-sm">
-                    <button onclick="muatLaporan()" class="bg-blue-600 text-white p-3 rounded-xl font-bold text-sm">TAMPILKAN</button>
-                    <button onclick="exportLaporan()" class="bg-green-600 text-white p-3 rounded-xl font-bold text-sm">EXPORT CSV</button>
+                <div class="bg-white p-6 rounded-3xl border mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 shadow-sm items-end">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Filter Tanggal</label>
+                        <input type="date" id="filter-date" class="w-full p-3 border rounded-xl text-sm outline-none bg-slate-50">
+                    </div>
+                    <button onclick="muatLaporan()" class="bg-blue-600 text-white p-3.5 rounded-xl font-bold text-sm hover:bg-blue-700 transition">TAMPILKAN DATA</button>
+                    <button onclick="exportLaporan()" class="bg-green-600 text-white p-3.5 rounded-xl font-bold text-sm hover:bg-green-700 transition">📥 EXPORT CSV</button>
                     <div class="bg-blue-50 p-2 rounded-xl text-center border border-blue-100">
-                        <div class="text-[9px] font-bold text-blue-400 uppercase">Grand Total</div>
-                        <div id="biaya-terfilter" class="font-black text-blue-700">Rp 0</div>
+                        <div class="text-[9px] font-bold text-blue-400 uppercase">Grand Total Biaya</div>
+                        <div id="biaya-terfilter" class="font-black text-blue-700 text-lg">Rp 0</div>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white rounded-3xl border overflow-hidden h-fit"><table class="w-full text-left text-sm"><thead class="bg-slate-50 border-b"><tr><th class="p-4 text-[10px]">DIVISI</th><th class="p-4 text-center text-[10px]">PORSI</th><th class="p-4 text-right text-[10px]">SUBTOTAL</th></tr></thead><tbody id="rekap-divisi-body" class="divide-y"></tbody></table></div>
-                    <div class="lg:col-span-2 bg-white rounded-3xl border overflow-hidden"><table class="w-full text-left text-sm"><thead class="bg-slate-50 border-b"><tr><th class="p-4 text-[10px]">WAKTU</th><th class="p-4 text-[10px]">NAMA STAFF</th><th class="p-4 text-[10px]">DIVISI</th></tr></thead><tbody id="report-table-body" class="divide-y"></tbody></table></div>
+                    <div class="bg-white rounded-3xl border overflow-hidden shadow-sm h-fit">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 border-b"><tr class="text-slate-500"><th class="p-4 text-[10px] font-bold">DIVISI</th><th class="p-4 text-center text-[10px] font-bold">PORSI</th><th class="p-4 text-right text-[10px] font-bold">SUBTOTAL</th></tr></thead>
+                            <tbody id="rekap-divisi-body" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                    <div class="lg:col-span-2 bg-white rounded-3xl border overflow-hidden shadow-sm">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-50 border-b text-slate-500"><tr><th class="p-4 text-[10px] font-bold uppercase">Waktu</th><th class="p-4 text-[10px] font-bold uppercase">Nama Staff</th><th class="p-4 text-[10px] font-bold uppercase">Divisi</th></tr></thead>
+                            <tbody id="report-table-body" class="divide-y"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
+        // --- KONFIGURASI SUPABASE ---
         const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
-        // JAM DIGITAL
+        // --- JAM DIGITAL ---
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID');
@@ -118,52 +132,56 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // --- FUNGSI UTAMA (PENTING!) ---
+        // --- NAVIGASI UTAMA ---
         function showPage(p) {
             if (p === 'admin') {
                 const pass = prompt("🔐 Password Admin:");
                 if (pass !== "kanti123") return alert("Akses Ditolak!");
                 document.getElementById('page-admin').classList.remove('hidden');
                 document.getElementById('page-scan').classList.add('hidden');
-                switchAdminSubPage('laporan'); // Default buka laporan
+                switchAdminSubPage('laporan'); // Halaman default admin
             } else {
                 document.getElementById('page-admin').classList.add('hidden');
                 document.getElementById('page-scan').classList.remove('hidden');
+                muatMenuHarianDisplay();
             }
         }
 
         function switchAdminSubPage(sub) {
-            // Sembunyikan semua section
             document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
-            
-            // Tampilkan section yang dipilih
             const target = document.getElementById('sub-' + sub);
             if(target) target.classList.remove('hidden');
 
-            // Panggil loader data masing-masing
             if(sub === 'staff') { muatStaff(); muatDivisiKeDropdown(); }
             if(sub === 'master-divisi') muatDivisi();
             if(sub === 'menu-makan') muatMenuHarianInput();
             if(sub === 'laporan') { document.getElementById('filter-date').valueAsDate = new Date(); muatLaporan(); }
         }
 
-        // --- MANAJEMEN DATA ---
+        // --- STAFF & DIVISI ---
         async function muatStaff() {
             const { data } = await _supabase.from('staff').select('*').order('nama');
-            document.getElementById('staff-table-body').innerHTML = data.map(s => `<tr><td class="p-4"><b>${s.nama}</b><br><small class="text-slate-400">${s.nik}</small></td><td class="p-4 uppercase text-[10px] font-bold">${s.divisi || '-'}</td><td class="p-4 text-right"><button onclick="hapusStaff('${s.nik}')" class="text-red-400 text-xs">HAPUS</button></td></tr>`).join('');
+            document.getElementById('staff-table-body').innerHTML = data.map(s => `
+                <tr class="hover:bg-slate-50 transition"><td class="p-4"><b>${s.nama}</b><br><small class="text-slate-400 font-mono">${s.nik}</small></td><td class="p-4 uppercase text-[10px] font-bold text-slate-500">${s.divisi || '-'}</td><td class="p-4 text-right"><button onclick="hapusStaff('${s.nik}')" class="text-red-400 font-bold text-xs hover:underline">HAPUS</button></td></tr>
+            `).join('');
         }
         async function simpanStaff() {
-            const n = document.getElementById('add-nama').value; const k = document.getElementById('add-nik').value; const d = document.getElementById('add-divisi-select').value;
-            await _supabase.from('staff').insert([{ nik: k, nama: n, divisi: d }]); muatStaff();
+            const n = document.getElementById('add-nama').value;
+            const k = document.getElementById('add-nik').value;
+            const d = document.getElementById('add-divisi-select').value;
+            if(!n || !k) return alert("Nama & NIK wajib diisi!");
+            await _supabase.from('staff').insert([{ nik: k, nama: n, divisi: d }]);
+            document.getElementById('add-nama').value = ''; document.getElementById('add-nik').value = '';
+            muatStaff();
         }
-        async function hapusStaff(nik) { if(confirm("Hapus?")) { await _supabase.from('staff').delete().eq('nik', nik); muatStaff(); } }
-
+        async function hapusStaff(nik) { if(confirm("Hapus data staff ini?")) { await _supabase.from('staff').delete().eq('nik', nik); muatStaff(); } }
         async function muatDivisi() {
             const { data } = await _supabase.from('master_divisi').select('*').order('nama_divisi');
-            document.getElementById('divisi-list').innerHTML = data.map(d => `<div class="bg-white p-4 rounded-2xl border flex justify-between items-center"><span class="text-xs font-bold uppercase">${d.nama_divisi}</span><button onclick="hapusDivisi(${d.id})" class="text-red-400 text-[10px] font-bold">HAPUS</button></div>`).join('');
+            document.getElementById('divisi-list').innerHTML = data.map(d => `<div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm"><span class="text-xs font-bold uppercase">${d.nama_divisi}</span><button onclick="hapusDivisi(${d.id})" class="text-red-400 text-[10px] font-bold hover:bg-red-50 p-1 px-2 rounded">HAPUS</button></div>`).join('');
         }
         async function simpanDivisi() { 
             const n = document.getElementById('new-divisi-name').value; 
+            if(!n) return;
             await _supabase.from('master_divisi').insert([{ nama_divisi: n }]); 
             document.getElementById('new-divisi-name').value = ''; muatDivisi(); 
         }
@@ -173,16 +191,21 @@
             document.getElementById('add-divisi-select').innerHTML = data.map(d => `<option value="${d.nama_divisi}">${d.nama_divisi}</option>`).join('');
         }
 
+        // --- MENU MAKAN ---
         async function muatMenuHarianInput() {
             const tgl = new Date().toISOString().split('T')[0];
             const { data } = await _supabase.from('menu_harian').select('*').eq('tanggal', tgl).single();
             if(data) { document.getElementById('input-menu-hari-ini').value = data.nama_menu; document.getElementById('input-harga-menu').value = data.harga; }
         }
         async function simpanMenu() {
-            const menu = document.getElementById('input-menu-hari-ini').value; const harga = document.getElementById('input-harga-menu').value || 0; const tgl = new Date().toISOString().split('T')[0];
-            await _supabase.from('menu_harian').upsert({ tanggal: tgl, nama_menu: menu, harga: harga }, { onConflict: 'tanggal' }); alert("Tersimpan!");
+            const menu = document.getElementById('input-menu-hari-ini').value; 
+            const harga = document.getElementById('input-harga-menu').value || 0; 
+            const tgl = new Date().toISOString().split('T')[0];
+            await _supabase.from('menu_harian').upsert({ tanggal: tgl, nama_menu: menu, harga: harga }, { onConflict: 'tanggal' }); 
+            alert("Menu berhasil diupdate untuk hari ini!");
         }
 
+        // --- LAPORAN & EXPORT ---
         async function muatLaporan() {
             const date = document.getElementById('filter-date').value;
             const { data: menu } = await _supabase.from('menu_harian').select('harga').eq('tanggal', date).single();
@@ -190,22 +213,36 @@
             const { data: klaim } = await _supabase.from('laporan_makan').select('*').gte('waktu', `${date}T00:00:00Z`).lte('waktu', `${date}T23:59:59Z`).order('waktu', { ascending: false });
 
             if(!klaim || klaim.length === 0) {
-                document.getElementById('report-table-body').innerHTML = '<tr><td colspan="3" class="p-8 text-center text-slate-300 italic">Data Kosong</td></tr>';
-                document.getElementById('rekap-divisi-body').innerHTML = '<tr><td colspan="3" class="p-8 text-center text-slate-300 italic">Kosong</td></tr>';
+                document.getElementById('report-table-body').innerHTML = '<tr><td colspan="3" class="p-8 text-center text-slate-300 italic">Data Tidak Tersedia</td></tr>';
+                document.getElementById('rekap-divisi-body').innerHTML = '<tr><td colspan="3" class="p-8 text-center text-slate-300 italic">N/A</td></tr>';
                 document.getElementById('biaya-terfilter').innerText = "Rp 0";
                 return;
             }
 
-            document.getElementById('report-table-body').innerHTML = klaim.map(l => `<tr><td class="p-4 font-mono text-[11px]">${new Date(l.waktu).toLocaleTimeString()}</td><td class="p-4 font-bold text-slate-700">${l.nama_staff}</td><td class="p-4 uppercase text-[10px] font-bold text-slate-400">${l.divisi || 'N/A'}</td></tr>`).join('');
+            document.getElementById('report-table-body').innerHTML = klaim.map(l => `<tr class="hover:bg-slate-50"><td class="p-4 font-mono text-[11px]">${new Date(l.waktu).toLocaleTimeString()}</td><td class="p-4 font-bold text-slate-700">${l.nama_staff}</td><td class="p-4 uppercase text-[10px] font-bold text-slate-400">${l.divisi || 'N/A'}</td></tr>`).join('');
 
             const rekap = {};
             let totalBiaya = 0;
             klaim.forEach(k => { const d = k.divisi || "N/A"; rekap[d] = (rekap[d] || 0) + 1; totalBiaya += hargaSatuan; });
 
-            document.getElementById('rekap-divisi-body').innerHTML = Object.keys(rekap).map(div => `<tr><td class="p-4 font-bold uppercase text-[10px]">${div}</td><td class="p-4 text-center font-bold text-blue-600">${rekap[div]}</td><td class="p-4 text-right font-black">${formatIDR(rekap[div] * hargaSatuan)}</td></tr>`).join('');
+            document.getElementById('rekap-divisi-body').innerHTML = Object.keys(rekap).map(div => `<tr><td class="p-4 font-bold uppercase text-[10px] text-slate-600">${div}</td><td class="p-4 text-center font-bold text-blue-600">${rekap[div]}</td><td class="p-4 text-right font-black text-slate-800">${formatIDR(rekap[div] * hargaSatuan)}</td></tr>`).join('');
             document.getElementById('biaya-terfilter').innerText = formatIDR(totalBiaya);
         }
 
+        async function exportLaporan() {
+            const date = document.getElementById('filter-date').value;
+            const { data } = await _supabase.from('laporan_makan').select('*').gte('waktu', `${date}T00:00:00Z`).lte('waktu', `${date}T23:59:59Z`).order('waktu', { ascending: true });
+            if(!data || data.length === 0) return alert("Tidak ada data untuk diexport!");
+            let csv = "data:text/csv;charset=utf-8,Waktu,NIK,Nama,Divisi\n";
+            data.forEach(r => csv += `${new Date(r.waktu).toLocaleTimeString()},${r.nik_staff},${r.nama_staff},${r.divisi || '-'}\n`);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", `Rekap_Makan_Kanti_${date}.csv`);
+            document.body.appendChild(link);
+            link.click(); document.body.removeChild(link);
+        }
+
+        // --- KLAIM MAKAN (LOGIKA UTAMA) ---
         async function prosesKlaim() {
             const input = document.getElementById('nik-input');
             const nik = input.value.trim();
@@ -217,23 +254,31 @@
                 const h = new Date().toISOString().split('T')[0];
                 const { data: su } = await _supabase.from('laporan_makan').select('*').eq('nik_staff', s.nik).gte('waktu', `${h}T00:00:00Z`).lte('waktu', `${h}T23:59:59Z`);
                 if(su && su.length >= (s.jatah_makan || 1)) {
-                    box.innerHTML = `⚠️ JATAH HABIS: ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-yellow-100 text-yellow-800 mb-6 text-center";
+                    box.innerHTML = `⚠️ JATAH HABIS: ${s.nama} sudah makan hari ini.`;
+                    box.className = "p-4 rounded-2xl font-bold bg-yellow-100 text-yellow-800 mb-6 text-center border border-yellow-200 shadow-sm";
                 } else {
                     await _supabase.from('laporan_makan').insert([{ nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi }]);
-                    box.innerHTML = `✅ BERHASIL: Selamat makan, ${s.nama}`; box.className = "p-4 rounded-2xl font-bold bg-green-100 text-green-700 mb-6 text-center border-2 border-green-200";
+                    box.innerHTML = `✅ BERHASIL: Selamat makan, ${s.nama}`;
+                    box.className = "p-4 rounded-2xl font-bold bg-green-100 text-green-700 mb-6 text-center border border-green-200 shadow-sm animate-bounce";
                 }
-            } else { box.innerHTML = "❌ NIK TIDAK ADA!"; box.className = "p-4 rounded-2xl font-bold bg-red-100 text-red-700 mb-6 text-center"; }
-            input.value = ''; input.focus(); box.classList.remove('hidden'); setTimeout(() => box.classList.add('hidden'), 4000);
+            } else {
+                box.innerHTML = "❌ NIK TIDAK TERDAFTAR!";
+                box.className = "p-4 rounded-2xl font-bold bg-red-100 text-red-700 mb-6 text-center border border-red-200 shadow-sm";
+            }
+            input.value = ''; input.focus();
+            box.classList.remove('hidden'); setTimeout(() => box.classList.add('hidden'), 5000);
         }
 
-        document.getElementById('nik-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') prosesKlaim(); });
-        
-        // Init Halaman Depan
-        (async () => {
+        // --- INIT LOAD ---
+        async function muatMenuHarianDisplay() {
             const tgl = new Date().toISOString().split('T')[0];
             const { data } = await _supabase.from('menu_harian').select('*').eq('tanggal', tgl).single();
             document.getElementById('display-menu-hari-ini').innerText = data ? data.nama_menu : "Menu Belum Diinput";
-        })();
+        }
+        
+        document.getElementById('nik-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') prosesKlaim(); });
+        muatMenuHarianDisplay();
+
     </script>
 </body>
 </html>
