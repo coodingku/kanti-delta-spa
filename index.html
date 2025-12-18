@@ -245,28 +245,47 @@
             }
         }
 
-        async function prosesSimpanMandiri() {
-            const btn = document.getElementById('btn-submit-regis');
-            const n = document.getElementById('reg-nama').value.trim();
-            const d = document.getElementById('reg-divisi').value;
-            if(!n) return alert("Isi nama Anda!");
-            btn.disabled = true; btn.innerText = "Processing...";
+       async function prosesSimpanMandiri() {
+    const btn = document.getElementById('btn-submit-regis');
+    const namaInput = document.getElementById('reg-nama').value.trim();
+    const divisiInput = document.getElementById('reg-divisi').value;
 
-            try {
-                const { data: allStaff } = await _supabase.from('staff').select('nik');
-                let maxNum = 0;
-                (allStaff || []).forEach(s => {
-                    const num = parseInt(s.nik.split('-')[1]);
-                    if(num > maxNum) maxNum = num;
-                });
-                const newNik = `KD-${(maxNum + 1).toString().padStart(3, '0')}`;
-                await _supabase.from('staff').insert({ nik: newNik, nama: n.toUpperCase(), divisi: d, is_active: true });
-                alert(`✅ BERHASIL!\nID ANDA: ${newNik}`);
-                document.getElementById('reg-nama').value = "";
-                closeRegisModal();
-            } catch (e) { alert("Error: " + e.message); }
-            finally { btn.disabled = false; btn.innerText = "Simpan & Daftar"; }
-        }
+    if(!namaInput) return alert("Nama tidak boleh kosong!");
+    
+    btn.disabled = true;
+    btn.innerText = "Mendaftarkan...";
+
+    try {
+        // Kita HANYA kirim nama dan divisi. 
+        // Database (Trigger) akan otomatis mengisi NIK.
+        const { data, error } = await _supabase
+            .from('staff')
+            .insert([{ 
+                nama: namaInput.toUpperCase(), 
+                divisi: divisiInput, 
+                is_active: true 
+            }])
+            .select(); 
+
+        if (error) throw error;
+
+        // Ambil NIK yang baru saja dibuat oleh database
+        const nikBaru = data[0].nik;
+
+        alert(`✅ PENDAFTARAN BERHASIL!\n\nID ANDA: ${nikBaru}`);
+        
+        document.getElementById('reg-nama').value = "";
+        closeRegisModal();
+        if(typeof muatStaff === "function") muatStaff(); 
+        
+    } catch (err) {
+        console.error("Error pendaftaran:", err);
+        alert("Gagal: " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Simpan & Daftar";
+    }
+}
 
         // --- ADMIN HELPERS ---
         async function muatStaff() {
@@ -412,3 +431,4 @@
     </script>
 </body>
 </html>
+
