@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanti Delta Spa - ERP v7.7 Fix</title>
+    <title>Kanti Delta Spa - ERP v7.8</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
@@ -80,7 +80,7 @@
     </div>
 
     <div id="page-admin" class="hidden min-h-screen bg-slate-50 flex overflow-hidden">
-        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col">
+        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl">
             <div class="p-8 text-xl font-bold text-blue-400 uppercase border-b border-slate-800">Admin Panel</div>
             <nav class="flex-1 px-4 py-6 space-y-1">
                 <button onclick="switchAdminSubPage('staff')" class="w-full text-left p-3.5 hover:bg-slate-800 rounded-xl transition">👥 Data Staff</button>
@@ -94,16 +94,16 @@
         </aside>
 
         <main class="flex-1 p-8 overflow-y-auto custom-scroll">
+            
             <section id="sub-staff" class="admin-subpage hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold uppercase">Manajemen Staff</h2>
                     <div class="flex gap-2">
-                        <label class="cursor-pointer bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📥 Import CSV <input type="file" id="import-excel" class="hidden" accept=".csv"></label>
-                        <button onclick="exportStaffData()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📤 Export CSV</button>
+                        <button onclick="exportStaffData()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📤 Export Data</button>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border grid grid-cols-4 gap-4 items-end mb-6 shadow-sm">
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2.5 border rounded-xl uppercase font-mono"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2.5 border rounded-xl font-mono uppercase"></div>
                     <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama</label><input type="text" id="add-nama" class="w-full p-2.5 border rounded-xl uppercase font-bold"></div>
                     <div><label class="text-[10px] font-bold text-slate-400 uppercase">Divisi</label><select id="add-divisi-select" class="w-full p-2.5 border rounded-xl bg-white"></select></div>
                     <button onclick="simpanStaff()" class="bg-slate-900 text-white p-2.5 rounded-xl font-bold uppercase">Simpan</button>
@@ -112,6 +112,7 @@
                     <table class="w-full text-left text-xs"><tbody id="staff-table-body" class="divide-y"></tbody></table>
                 </div>
             </section>
+
             <section id="sub-master-divisi" class="admin-subpage hidden">
                 <h2 class="text-2xl font-bold mb-6">Master Divisi / Dept</h2>
                 <div class="bg-white p-6 rounded-3xl border mb-6 flex gap-4 max-w-md shadow-sm">
@@ -120,45 +121,61 @@
                 </div>
                 <div id="divisi-list" class="grid grid-cols-3 gap-4"></div>
             </section>
+
             <section id="sub-menu-makan" class="admin-subpage hidden">
-                <h2 class="text-2xl font-bold mb-6">Update Menu</h2>
+                <h2 class="text-2xl font-bold mb-6">Update Menu Hari Ini</h2>
                 <div class="bg-white p-8 rounded-3xl border max-w-md space-y-4 shadow-sm">
                     <textarea id="input-menu-hari-ini" rows="2" class="w-full p-3 border rounded-xl" placeholder="Menu Hari Ini"></textarea>
-                    <input type="number" id="input-harga-menu" class="w-full p-3 border rounded-xl" placeholder="Harga Satuan">
+                    <input type="number" id="input-harga-menu" class="w-full p-3 border rounded-xl" placeholder="Harga Satuan (Rp)">
                     <div class="flex gap-2">
-                        <button onclick="simpanMenu()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold">AKTIFKAN SCAN</button>
+                        <button onclick="simpanMenu()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">AKTIFKAN SCAN</button>
                         <button onclick="hapusMenuHariIni()" class="bg-red-50 text-red-600 px-6 rounded-2xl font-bold border border-red-100">RESET</button>
                     </div>
                 </div>
             </section>
-             <section id="sub-laporan-scan" class="admin-subpage hidden">
+
+            <section id="sub-laporan-scan" class="admin-subpage hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold uppercase">Laporan Scan</h2>
+                    <h2 class="text-2xl font-bold uppercase">Laporan Scan Harian</h2>
                     <button onclick="exportLaporanScan()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📤 Export CSV</button>
                 </div>
-                <div class="bg-white p-6 rounded-3xl border grid grid-cols-3 gap-4 mb-6"><input type="date" id="scan-filter-date" class="p-3 border rounded-xl"><select id="scan-filter-divisi" class="p-3 border rounded-xl bg-white"></select><button onclick="muatLaporanScan()" class="bg-blue-600 text-white rounded-xl font-bold">CARI</button></div>
-                <div class="bg-white rounded-3xl border overflow-hidden"><table class="w-full text-left text-xs"><tbody id="scan-table-body" class="divide-y"></tbody></table></div>
+                <div class="bg-white p-6 rounded-3xl border grid grid-cols-3 gap-4 mb-6 shadow-sm">
+                    <input type="date" id="scan-filter-date" class="p-3 border rounded-xl">
+                    <select id="scan-filter-divisi" class="p-3 border rounded-xl bg-white"></select>
+                    <button onclick="muatLaporanScan()" class="bg-blue-600 text-white rounded-xl font-bold">CARI DATA</button>
+                </div>
+                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs"><tbody id="scan-table-body" class="divide-y"></tbody></table>
+                </div>
             </section>
+
             <section id="sub-laporan-detail" class="admin-subpage hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold uppercase">Rekap Biaya</h2>
+                    <h2 class="text-2xl font-bold uppercase">Rekap Biaya Makan</h2>
                     <button onclick="exportLaporanDetail()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📤 Export CSV</button>
                 </div>
-                <div class="bg-white p-6 rounded-3xl border grid grid-cols-3 gap-4 mb-6"><input type="date" id="det-filter-date" class="p-3 border rounded-xl"><select id="det-filter-divisi" class="p-3 border rounded-xl bg-white"></select><button onclick="muatLaporanDetail()" class="bg-blue-600 text-white rounded-xl font-bold">HITUNG</button></div>
+                <div class="bg-white p-6 rounded-3xl border grid grid-cols-3 gap-4 mb-6 shadow-sm">
+                    <input type="date" id="det-filter-date" class="p-3 border rounded-xl">
+                    <select id="det-filter-divisi" class="p-3 border rounded-xl bg-white"></select>
+                    <button onclick="muatLaporanDetail()" class="bg-blue-600 text-white rounded-xl font-bold">HITUNG REKAP</button>
+                </div>
                 <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
-                    <table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold border-b text-slate-400 uppercase"><tr><th class="p-4">Nama</th><th class="p-4 text-center">Status</th><th class="p-4 text-right">Biaya</th></tr></thead><tbody id="detail-table-body" class="divide-y"></tbody></table>
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold border-b text-slate-400 uppercase"><tr><th class="p-4">Nama Staff</th><th class="p-4 text-center">Status Scan</th><th class="p-4 text-right">Biaya</th></tr></thead>
+                        <tbody id="detail-table-body" class="divide-y"></tbody>
+                    </table>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
-       const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
-        // --- CORE: SYNC MENU ---
+        // --- CORE: AUTO HIDE SCAN ---
         async function sinkronisasiMenu() {
             const tgl = new Date().toISOString().split('T')[0];
             const { data } = await _supabase.from('menu_harian').select('nama_menu').eq('tanggal', tgl).maybeSingle();
@@ -174,7 +191,7 @@
             }
         }
 
-        // --- DAFTAR MANDIRI (FIXED) ---
+        // --- DAFTAR MANDIRI ANTI BENTROK ---
         async function openRegisModal() {
             await muatDivisiKeDropdown('reg-divisi');
             document.getElementById('modal-regis').classList.remove('hidden');
@@ -189,34 +206,62 @@
             btn.disabled = true; btn.innerText = "Processing...";
 
             try {
-                // Cari angka terakhir dari NIK (Bukan sekedar jumlah baris)
                 const { data: allStaff } = await _supabase.from('staff').select('nik');
                 let maxNum = 0;
                 (allStaff || []).forEach(s => {
-                    const num = parseInt(s.nik.split('-')[1]);
-                    if(num > maxNum) maxNum = num;
+                    const parts = s.nik.split('-');
+                    if(parts.length > 1){
+                        const num = parseInt(parts[1]);
+                        if(num > maxNum) maxNum = num;
+                    }
                 });
                 
                 const newNik = `KD-${(maxNum + 1).toString().padStart(3, '0')}`;
-
-                const { error } = await _supabase.from('staff').insert({ 
-                    nik: newNik, 
-                    nama: n.toUpperCase(), 
-                    divisi: d, 
-                    is_active: true 
-                });
-
+                const { error } = await _supabase.from('staff').insert({ nik: newNik, nama: n.toUpperCase(), divisi: d, is_active: true });
                 if(error) throw error;
 
-                alert(`✅ BERHASIL!\nNIK ANDA: ${newNik}\nCatat NIK ini untuk absen makan.`);
+                alert(`✅ BERHASIL!\nID ANDA: ${newNik}`);
                 document.getElementById('reg-nama').value = "";
                 closeRegisModal();
             } catch (e) {
-                console.error(e);
-                alert("Gagal: " + (e.message || "Pastikan tabel staff sudah benar."));
+                alert("Gagal daftar: " + e.message);
             } finally {
                 btn.disabled = false; btn.innerText = "Simpan & Daftar";
             }
+        }
+
+        // --- EXPORT FUNCTIONS (RE-ADDED) ---
+        function downloadCSV(name, csv) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', name); a.click();
+        }
+
+        function exportStaffData() {
+            let csv = "NIK,Nama,Status,Divisi\n";
+            document.querySelectorAll("#staff-table-body tr").forEach(tr => {
+                const row = Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join(",");
+                csv += row + "\n";
+            });
+            downloadCSV("Data_Staff.csv", csv);
+        }
+
+        function exportLaporanScan() {
+            let csv = "Waktu,Nama Staff,Divisi\n";
+            document.querySelectorAll("#scan-table-body tr").forEach(tr => {
+                const row = Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join(",");
+                csv += row + "\n";
+            });
+            downloadCSV("Laporan_Scan_Harian.csv", csv);
+        }
+
+        function exportLaporanDetail() {
+            let csv = "Nama Staff,Status Scan,Biaya\n";
+            document.querySelectorAll("#detail-table-body tr").forEach(tr => {
+                const row = Array.from(tr.querySelectorAll("td")).map(td => td.innerText).join(",");
+                csv += row + "\n";
+            });
+            downloadCSV("Rekap_Biaya_Makan.csv", csv);
         }
 
         // --- ADMIN FUNCTIONS ---
@@ -251,7 +296,6 @@
             document.getElementById(target).innerHTML = h;
         }
 
-        // --- LAPORAN ---
         async function muatLaporanScan() {
             const t = document.getElementById('scan-filter-date').value;
             const d = document.getElementById('scan-filter-divisi').value;
