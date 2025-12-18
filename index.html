@@ -107,11 +107,32 @@
         
         <main class="flex-1 p-8 overflow-y-auto custom-scroll">
             
-            <section id="sub-staff" class="admin-subpage hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold uppercase">Manajemen Staff</h2>
-                    <button onclick="exportStaffData()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">📤 Export CSV</button>
-                </div>
+           <section id="sub-staff" class="admin-subpage hidden">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <h2 class="text-2xl font-bold uppercase">Manajemen Staff</h2>
+        <div class="flex gap-2 w-full md:w-auto">
+            <div class="relative flex-1">
+                <input type="text" id="search-staff" onkeyup="filterTabelStaff()" 
+                    placeholder="Cari Nama atau NIK..." 
+                    class="w-full md:w-64 p-2.5 pl-4 border rounded-xl text-xs focus:border-blue-500 outline-none shadow-sm"
+                >
+            </div>
+            <button onclick="exportStaffData()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase shadow-md hover:bg-blue-700 transition">
+                📤 Export
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl border grid grid-cols-4 gap-4 items-end mb-6 shadow-sm">
+        ... (isi form input Anda) ...
+    </div>
+
+    <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
+        <table class="w-full text-left text-xs">
+            <tbody id="staff-table-body" class="divide-y"></tbody>
+        </table>
+    </div>
+</section>
                 <div class="bg-white p-6 rounded-3xl border grid grid-cols-4 gap-4 items-end mb-6 shadow-sm">
                     <div><label class="text-[10px] font-bold text-slate-400 uppercase">NIK</label><input type="text" id="add-nik" class="w-full p-2.5 border rounded-xl font-mono uppercase"></div>
                     <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama</label><input type="text" id="add-nama" class="w-full p-2.5 border rounded-xl uppercase font-bold"></div>
@@ -185,6 +206,33 @@
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
+
+function filterTabelStaff() {
+    // 1. Ambil input pencarian
+    const input = document.getElementById("search-staff");
+    const filter = input.value.toUpperCase();
+    const tableBody = document.getElementById("staff-table-body");
+    const tr = tableBody.getElementsByTagName("tr");
+
+    // 2. Loop semua baris tabel, sembunyikan yang tidak cocok dengan pencarian
+    for (let i = 0; i < tr.length; i++) {
+        // Kolom 0 = NIK, Kolom 1 = Nama
+        const tdNik = tr[i].getElementsByTagName("td")[0];
+        const tdNama = tr[i].getElementsByTagName("td")[1];
+        
+        if (tdNik || tdNama) {
+            const txtNik = tdNik.textContent || tdNik.innerText;
+            const txtNama = tdNama.textContent || tdNama.innerText;
+            
+            if (txtNik.toUpperCase().indexOf(filter) > -1 || txtNama.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = ""; // Tampilkan
+            } else {
+                tr[i].style.display = "none"; // Sembunyikan
+            }
+        }
+    }
+}
+       
         // --- EXPORT TOOLS ---
         function downloadCSV(name, csv) {
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -494,6 +542,7 @@ function toggleRegisStatus() {
     </script>
 </body>
 </html>
+
 
 
 
