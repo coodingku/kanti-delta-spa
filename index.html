@@ -335,18 +335,7 @@ window.onload = function() {
                 'postgres_changes', 
                 { event: 'INSERT', schema: 'public', table: 'kantin_chat' }, 
                 (payload) => {
-                   // Ganti bagian tampilan di dalam (payload) => { ... }
-const msg = payload.new;
-const container = document.getElementById('message-container');
-
-// Cek apakah pesan dari kita sendiri atau orang lain (opsional)
-const isMe = msg.nama_staff === localStorage.getItem('nama_staff');
-const bgColor = isMe ? '#dcf8c6' : '#ffffff'; // Hijau muda jika kita sendiri, putih jika orang lain
-
-container.innerHTML += `
-    // PASTIKAN BAGIAN INI DITULIS PERSIS SEPERTI INI
-container.innerHTML += `
-   const msg = payload.new;
+                    const msg = payload.new;
                     const container = document.getElementById('message-container');
                     if(container) {
                         container.innerHTML += `
@@ -767,6 +756,7 @@ loadChatHistory();
     </script>
 </body>
 </html>
+
 
 
 
