@@ -292,35 +292,59 @@
     let chartStatusInstance = null;
 
     // Fungsi Buka Tutup Jendela Chat
-    function toggleChat() {
-        const chat = document.getElementById('chat-window');
-        if (chat) chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
-    }
+    async function toggleChat() {
+    const chatWindow = document.getElementById('chat-window');
+    
+    if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+        const inputNik = prompt("Masukkan NIK Staff Anda:");
         
+        if (inputNik) {
+            // Mencari di tabel staff berdasarkan kolom 'nik'
+            const { data, error } = await supabase
+                .from('staff') 
+                .select('nama, divisi')
+                .eq('nik', inputNik)
+                .single();
+
+            if (data) {
+                // Simpan data ke localStorage agar bisa digunakan saat kirim pesan
+                localStorage.setItem('nama', data.nama);
+                localStorage.setItem('divisi', data.divisi);
+                
+                alert("Selamat datang, " + data.nama + " (" + data.divisi + ")");
+                chatWindow.style.display = 'flex';
+            } else {
+                alert("NIK tidak terdaftar atau salah!");
+            }
+        }
+    } else {
+        chatWindow.style.display = 'none';
+    }
+}
 async function kirimPesan() {
     const input = document.getElementById('chat-input');
     const pesanText = input.value;
+    
+    // Mengambil data hasil validasi NIK
+    const namaUser = localStorage.getItem('nama');
+    const divisiUser = localStorage.getItem('divisi') || 'Kantin';
 
-    // Gunakan 'supabase' yang sudah kita buat di atas
-    if (typeof supabase === 'undefined') {
-        console.error("Koneksi Supabase belum terinisialisasi");
-        return;
-    }
-
-    if (pesanText.trim() !== "") {
+    if (pesanText.trim() !== "" && namaUser) {
         const { error } = await supabase
             .from('kantin_chat')
             .insert([{ 
-                nama_staff: localStorage.getItem('nama_staff') || 'Staff', 
+                nama_staff: namaUser, 
                 pesan: pesanText, 
-                divisi: localStorage.getItem('divisi') || 'Kantin' 
+                divisi: divisiUser 
             }]);
 
         if (!error) {
-            input.value = ''; 
+            input.value = '';
         } else {
-            console.error("Gagal kirim chat:", error.message);
+            console.error("Gagal kirim pesan:", error.message);
         }
+    } else if (!namaUser) {
+        alert("Silakan login kembali dengan NIK!");
     }
 }
 // Perbaikan: Bungkus bagian ini agar tidak error saat load
@@ -756,6 +780,7 @@ loadChatHistory();
     </script>
 </body>
 </html>
+
 
 
 
