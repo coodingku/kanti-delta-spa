@@ -278,7 +278,7 @@
         // --- KONFIGURASI SUPABASE ---
         const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
         let chartDivisiInstance = null;
@@ -294,31 +294,27 @@ async function kirimPesan() {
     const input = document.getElementById('chat-input');
     const pesanText = input.value;
     
-    // Pastikan kita menggunakan client yang benar
-    // Jika di bagian atas file Anda menggunakan nama lain, sesuaikan di sini
-    if (typeof supabase === 'undefined' || typeof supabase.from !== 'function') {
-        console.error("Koneksi Supabase belum siap atau salah inisialisasi");
-        alert("Sistem chat sedang gangguan, silakan refresh halaman.");
+    // Gunakan window.supabase untuk memastikan mengambil client utama
+    const client = window.supabase;
+
+    if (!client || typeof client.from !== 'function') {
+        console.error("Supabase Client tidak ditemukan atau tidak valid!");
         return;
     }
 
     if (pesanText.trim() !== "") {
-        try {
-            const { error } = await supabase
-                .from('kantin_chat')
-                .insert([{ 
-                    nama_staff: localStorage.getItem('nama_staff') || 'Staff', 
-                    pesan: pesanText, 
-                    divisi: localStorage.getItem('divisi') || 'Kantin' 
-                }]);
+        const { error } = await client
+            .from('kantin_chat') // Nama tabel untuk chatting di Kantin
+            .insert([{ 
+                nama_staff: localStorage.getItem('nama_staff') || 'Staff', 
+                pesan: pesanText, 
+                divisi: localStorage.getItem('divisi') || 'Kantin' 
+            }]);
 
-            if (!error) {
-                input.value = ''; 
-            } else {
-                console.error("Error dari Supabase:", error.message);
-            }
-        } catch (err) {
-            console.error("Gagal menjalankan perintah .from():", err);
+        if (!error) {
+            input.value = ''; 
+        } else {
+            console.error("Gagal mengirim ke database:", error.message);
         }
     }
 }
@@ -718,6 +714,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
