@@ -282,7 +282,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // Gunakan S besar untuk memanggil library Supabase-js
 // Cukup panggil namanya saja tanpa 'const'
-supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // --- UTILITAS ---
 const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
 
@@ -716,6 +716,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
