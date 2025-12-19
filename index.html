@@ -75,6 +75,7 @@
             </div>
 
             <div class="bg-amber-50 border border-amber-100 p-4 rounded-3xl w-full max-w-xs text-center shadow-sm">
+                <p id="label-sesi-aktif" class="text-[9px] font-black text-amber-600 uppercase mb-1 tracking-tighter">Sesi Aktif: -</p>
                 <p id="display-menu-hari-ini" class="text-lg font-black text-slate-800 italic uppercase">MEMUAT MENU...</p>
             </div>
 
@@ -107,9 +108,20 @@
                 <button id="nav-master-divisi" onclick="switchAdminSubPage('master-divisi')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl transition-all font-bold flex items-center gap-2 text-slate-400">🏢 Master Divisi</button>
                 <button id="nav-menu-makan" onclick="switchAdminSubPage('menu-makan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl transition-all font-bold flex items-center gap-2 text-orange-400">🍱 Update Menu</button>
                 
+                <div class="pt-4 text-[9px] font-black text-slate-600 uppercase px-3 mb-2 tracking-widest">Manual Session Control</div>
+                <div class="px-3 py-3 bg-slate-800/50 rounded-2xl mx-1 mb-2 border border-slate-700">
+                    <label class="text-[8px] font-bold text-slate-500 uppercase">Pilih Sesi Aktif</label>
+                    <select id="select-sesi-manual" onchange="updateSesiManual()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 mt-1 text-[10px] font-black text-amber-400 outline-none cursor-pointer">
+                        <option value="Sesi 1">Sesi Makan 1</option>
+                        <option value="Sesi 2">Sesi Makan 2</option>
+                        <option value="Sesi 3">Sesi Makan 3</option>
+                    </select>
+                </div>
+
                 <div class="pt-4 text-[9px] font-black text-slate-600 uppercase px-3 mb-2 tracking-widest">Reports</div>
                 <button id="nav-laporan-scan" onclick="switchAdminSubPage('laporan-scan')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl transition-all font-bold flex items-center gap-2 text-emerald-400">📜 Laporan Scan</button>
                 <button id="nav-laporan-detail" onclick="switchAdminSubPage('laporan-detail')" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl transition-all font-bold flex items-center gap-2 text-blue-400">💰 Rekap Biaya</button>  
+
                 <div class="pt-4 text-[9px] font-black text-slate-600 uppercase px-3 mb-2 tracking-widest">Settings</div>
                 <button id="btn-toggle-regis" onclick="toggleRegisStatus()" class="w-full text-left p-3 hover:bg-slate-800 rounded-xl font-bold flex justify-between items-center text-slate-400">
                     <span class="flex items-center gap-2">🔑 Registrasi</span>
@@ -124,7 +136,6 @@
         </aside>
 
         <main class="flex-1 overflow-y-auto p-6 custom-scroll">
-            
             <section id="sub-dashboard" class="admin-subpage hidden">
                 <h2 class="text-xl font-black mb-6 uppercase tracking-tight">Executive Dashboard</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -216,7 +227,7 @@
                 </div>
                 <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
                     <table id="scan-table" class="w-full text-left text-[10px]">
-                        <thead class="bg-slate-50 border-b font-black text-slate-400"><tr><th class="p-4">Jam</th><th class="p-4">Nama Staff</th><th class="p-4">Divisi</th></tr></thead>
+                        <thead class="bg-slate-50 border-b font-black text-slate-400"><tr><th class="p-4">Jam</th><th class="p-4">Sesi</th><th class="p-4">Nama Staff</th><th class="p-4">Divisi</th></tr></thead>
                         <tbody id="scan-table-body" class="divide-y"></tbody>
                     </table>
                 </div>
@@ -244,7 +255,7 @@
 
     <script>
         // --- KONFIGURASI SUPABASE ---
-       const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -252,7 +263,21 @@
         let chartDivisiInstance = null;
         let chartStatusInstance = null;
 
-        // --- CORE FUNCTIONS (ADMIN NAVIGATION) ---
+        // --- VARIABLE GLOBAL SESI ---
+        let SESI_AKTIF = localStorage.getItem('kantin_sesi_aktif') || "Sesi 1";
+
+        function updateSesiManual() {
+            const select = document.getElementById('select-sesi-manual');
+            if(select) {
+                SESI_AKTIF = select.value;
+                localStorage.setItem('kantin_sesi_aktif', SESI_AKTIF);
+                const label = document.getElementById('label-sesi-aktif');
+                if(label) label.innerText = "Sesi Aktif: " + SESI_AKTIF;
+                alert("Sesi Makan Diaktifkan: " + SESI_AKTIF);
+            }
+        }
+
+        // --- CORE FUNCTIONS ---
         async function switchAdminSubPage(sub) {
             document.querySelectorAll('.admin-subpage').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('aside nav button').forEach(b => b.classList.remove('active-nav'));
@@ -263,7 +288,6 @@
             const navBtn = document.getElementById('nav-' + sub); 
             if(navBtn) navBtn.classList.add('active-nav');
 
-            // Jalankan loader data sesuai sub-page
             if(sub === 'dashboard') muatDashboard();
             if(sub === 'staff') { muatStaff(); muatDivisiKeDropdown('add-divisi-select'); }
             if(sub === 'master-divisi') muatDivisi();
@@ -279,7 +303,6 @@
             }
         }
 
-        // --- DASHBOARD LOADER ---
         async function muatDashboard() {
             const tgl = new Date().toISOString().split('T')[0];
             const { data: scans } = await _supabase.from('laporan_makan').select('*').gte('waktu', `${tgl}T00:00:00Z`).lte('waktu', `${tgl}T23:59:59Z`);
@@ -291,7 +314,6 @@
             document.getElementById('stat-staff-aktif').innerText = allStaff ? allStaff.length : 0;
             document.getElementById('stat-total-biaya').innerText = formatIDR((scans ? scans.length : 0) * harga);
 
-            // Chart Divisi
             const divData = {}; (scans || []).forEach(s => divData[s.divisi] = (divData[s.divisi] || 0) + 1);
             if(chartDivisiInstance) chartDivisiInstance.destroy();
             chartDivisiInstance = new Chart(document.getElementById('chartDivisi'), {
@@ -300,7 +322,6 @@
                 options: { responsive: true, plugins: { legend: { display: false } } }
             });
 
-            // Chart Status
             const aktif = allStaff ? allStaff.filter(s => s.is_active).length : 0;
             const non = allStaff ? allStaff.filter(s => !s.is_active).length : 0;
             if(chartStatusInstance) chartStatusInstance.destroy();
@@ -371,56 +392,36 @@
         }
 
         // --- MENU FUNCTIONS ---
-   async function sinkronisasiMenu() {
-    // Ambil tanggal lokal hari ini (Y-m-d)
-    const n = new Date();
-    const tglLokal = n.getFullYear() + '-' + 
-                     String(n.getMonth() + 1).padStart(2, '0') + '-' + 
-                     String(n.getDate()).padStart(2, '0');
+        async function sinkronisasiMenu() {
+            const n = new Date();
+            const tglLokal = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+            const { data } = await _supabase.from('menu_harian').select('nama_menu').eq('tanggal', tglLokal).maybeSingle();
 
-    console.log("Mengecek menu untuk tanggal:", tglLokal); // Untuk cek di console
+            if (data && data.nama_menu) {
+                document.getElementById('display-menu-hari-ini').innerText = data.nama_menu;
+                document.getElementById('scan-container').classList.remove('hidden');
+                document.getElementById('no-menu-msg').classList.add('hidden');
+            } else {
+                document.getElementById('display-menu-hari-ini').innerText = "MENU BELUM DIINPUT (" + tglLokal + ")";
+                document.getElementById('scan-container').classList.add('hidden');
+                document.getElementById('no-menu-msg').classList.remove('hidden');
+            }
+        }
 
-    const { data, error } = await _supabase.from('menu_harian')
-        .select('nama_menu')
-        .eq('tanggal', tglLokal)
-        .maybeSingle();
+        async function simpanMenu() {
+            const m = document.getElementById('input-menu-hari-ini').value;
+            const h = document.getElementById('input-harga-menu').value || 0;
+            const n = new Date();
+            const tglLokal = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
 
-    if (data && data.nama_menu) {
-        document.getElementById('display-menu-hari-ini').innerText = data.nama_menu;
-        document.getElementById('scan-container').classList.remove('hidden');
-        document.getElementById('no-menu-msg').classList.add('hidden');
-    } else {
-        document.getElementById('display-menu-hari-ini').innerText = "MENU BELUM DIINPUT (" + tglLokal + ")";
-        document.getElementById('scan-container').classList.add('hidden');
-        document.getElementById('no-menu-msg').classList.remove('hidden');
-    }
-}
-       async function simpanMenu() {
-    const m = document.getElementById('input-menu-hari-ini').value;
-    const h = document.getElementById('input-harga-menu').value || 0;
-    
-    // Pastikan tanggal yang disimpan adalah tanggal lokal hari ini
-    const n = new Date();
-    const tglLokal = n.getFullYear() + '-' + 
-                     String(n.getMonth() + 1).padStart(2, '0') + '-' + 
-                     String(n.getDate()).padStart(2, '0');
+            if(!m) return alert("Isi nama menu!");
+            const { error } = await _supabase.from('menu_harian').upsert({ tanggal: tglLokal, nama_menu: m.toUpperCase(), harga: h }, { onConflict: 'tanggal' });
 
-    if(!m) return alert("Isi nama menu!");
-
-    const { error } = await _supabase.from('menu_harian')
-        .upsert({ 
-            tanggal: tglLokal, 
-            nama_menu: m.toUpperCase(), 
-            harga: h 
-        }, { onConflict: 'tanggal' });
-
-    if(!error) {
-        alert("Menu untuk tanggal " + tglLokal + " berhasil diaktifkan!");
-        sinkronisasiMenu();
-    } else {
-        alert("Gagal simpan menu: " + error.message);
-    }
-}
+            if(!error) {
+                alert("Menu Aktif!");
+                sinkronisasiMenu();
+            }
+        }
 
         async function hapusMenuHariIni() {
             const t = new Date().toISOString().split('T')[0];
@@ -428,7 +429,7 @@
             sinkronisasiMenu();
         }
 
-        // --- REGISTRATION LOGIC (DATABASE SYNC) ---
+        // --- REGISTRATION ---
         async function cekStatusRegistrasi() {
             const { data } = await _supabase.from('settings').select('value').eq('key', 'is_regis_enabled').maybeSingle();
             const isEnabled = data ? data.value : true;
@@ -473,7 +474,7 @@
             finally { btn.disabled = false; btn.innerText = "Daftar"; }
         }
 
-        // --- REPORTS & PDF ---
+        // --- LAPORAN & PDF ---
         async function muatLaporanScan() {
             const t = document.getElementById('scan-filter-date').value;
             const d = document.getElementById('scan-filter-divisi').value;
@@ -484,6 +485,7 @@
             document.getElementById('scan-table-body').innerHTML = (data || []).map(l => `
                 <tr>
                     <td class="p-4 font-bold text-blue-600">${new Date(l.waktu).toLocaleTimeString()}</td>
+                    <td class="p-4 font-bold text-amber-600">${l.sesi || '-'}</td>
                     <td class="p-4 font-bold uppercase">${l.nama_staff}</td>
                     <td class="p-4 uppercase text-slate-400 font-bold">${l.divisi}</td>
                 </tr>`).join('');
@@ -497,8 +499,9 @@
             const h = menu ? menu.harga : 0;
             let qs = _supabase.from('staff').select('*'); 
             if(div !== 'SEMUA') qs = qs.eq('divisi', div);
-            const { data: staffs } = await qs.order('nama');
+            const { data: staffs } = await staffs_query = qs.order('nama');
             const { data: klaims } = await _supabase.from('laporan_makan').select('nik_staff').gte('waktu', `${t}T00:00:00Z`).lte('waktu', `${t}T23:59:59Z`);
+            
             document.getElementById('detail-table-body').innerHTML = (staffs || []).map(s => {
                 const k = (klaims || []).some(x => x.nik_staff === s.nik);
                 return `<tr><td class="p-4 font-bold uppercase">${s.nama}</td><td class="p-4 font-black text-center ${k?'text-emerald-500':'text-slate-200'}">${k?'SCAN OK':'-'}</td><td class="p-4 text-right font-bold">${formatIDR(k?h:0)}</td></tr>`;
@@ -508,93 +511,79 @@
         function cetakPDF(type) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.text(`KANTIN SPA REPORT - ${type.toUpperCase()}`, 14, 20);
+            doc.text(`KANTIN DELTA SPA REPORT - ${type.toUpperCase()}`, 14, 20);
             const tableId = type === 'staff' ? "#staff-table" : (type === 'scan' ? "#scan-table" : "#detail-table");
             doc.autoTable({ html: tableId, startY: 30 });
-            doc.save(`Kanti_Report_${type}.pdf`);
+            doc.save(`Kantin_Report_${type}.pdf`);
+        }
+
+        // --- SCAN PROCESS (LOGIKA SESI MANUAL) ---
+        async function prosesKlaim() {
+            const input = document.getElementById('nik-input');
+            const nik = input.value.trim().toUpperCase();
+            const box = document.getElementById('status-msg');
+            const tgl = new Date().toISOString().split('T')[0];
+            if(!nik) return;
+
+            input.disabled = true;
+            const { data: s } = await _supabase.from('staff').select('*').eq('nik', nik).maybeSingle();
+            box.classList.remove('hidden', 'bg-emerald-50', 'bg-rose-50', 'text-emerald-700', 'text-rose-700');
+
+            if(s && s.is_active) {
+                // Cek apakah sudah makan di SESI yang sedang aktif saat ini
+                const { data: sudahMakan } = await _supabase.from('laporan_makan')
+                    .select('id')
+                    .eq('nik_staff', nik)
+                    .eq('sesi', SESI_AKTIF)
+                    .gte('waktu', `${tgl}T00:00:00Z`)
+                    .lte('waktu', `${tgl}T23:59:59Z`)
+                    .maybeSingle();
+
+                if (sudahMakan) {
+                    box.innerText = "❌ GAGAL: SUDAH SCAN UNTUK " + SESI_AKTIF;
+                    box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center";
+                } else {
+                    const { error } = await _supabase.from('laporan_makan').insert([{ 
+                        nik_staff: s.nik, nama_staff: s.nama, divisi: s.divisi, sesi: SESI_AKTIF 
+                    }]);
+                    if(!error) {
+                        box.innerText = "✅ BERHASIL " + SESI_AKTIF + ": " + s.nama; 
+                        box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold border border-emerald-100 text-center";
+                    } else { box.innerText = "⚠️ GANGGUAN SISTEM"; }
+                }
+            } else { 
+                box.innerText = "❌ ID TIDAK DITEMUKAN / NON-AKTIF"; 
+                box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center"; 
+            }
+            input.disabled = false; input.value = ''; input.focus();
+            setTimeout(() => box.classList.add('hidden'), 4000);
         }
 
         // --- SYSTEM UTILS ---
         function showPage(p) {
             if(p==='admin') {
-                if(prompt("Password Admin:")!=="kanti123") return;
+                if(prompt("Password Admin:")!=="kantin1234") return;
                 document.getElementById('page-admin').classList.remove('hidden');
                 document.getElementById('page-scan').classList.add('hidden');
+                
+                // Sinkronkan pilihan dropdown sesi di sidebar dengan variabel global
+                const selectSesi = document.getElementById('select-sesi-manual');
+                if(selectSesi) selectSesi.value = SESI_AKTIF;
+                
                 switchAdminSubPage('dashboard');
             } else {
                 document.getElementById('page-admin').classList.add('hidden');
                 document.getElementById('page-scan').classList.remove('hidden');
+                
+                // Update label sesi di halaman scan
+                const label = document.getElementById('label-sesi-aktif');
+                if(label) label.innerText = "Sesi Aktif: " + SESI_AKTIF;
+                
                 sinkronisasiMenu();
                 cekStatusRegistrasi();
             }
         }
 
-        async function resetAllData() {
-            if(prompt("Ketik 'HAPUS' untuk reset semua data:") === 'HAPUS') {
-                await _supabase.from('laporan_makan').delete().neq('id', 0);
-                alert("Data scan berhasil direset.");
-                location.reload();
-            }
-        }
-
-        function updateClock() {
-            const n = new Date();
-            const clockEl = document.getElementById('clock');
-            const dateEl = document.getElementById('date-display');
-            if(clockEl) clockEl.innerText = n.toLocaleTimeString('id-ID', { hour12: false });
-            if(dateEl) dateEl.innerText = n.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-        }
-
-        // --- SCAN PROCESS ---
-  async function prosesKlaim() {
-    const input = document.getElementById('nik-input');
-    const nik = input.value.trim().toUpperCase();
-    const box = document.getElementById('status-msg');
-    if(!nik) return;
-
-    input.disabled = true;
-
-    // 1. Validasi Staff
-    const { data: s } = await _supabase
-        .from('staff')
-        .select('*')
-        .eq('nik', nik)
-        .maybeSingle();
-    
-    box.classList.remove('hidden', 'bg-emerald-50', 'bg-rose-50', 'text-emerald-700', 'text-rose-700');
-
-    if(s && s.is_active) {
-        // 2. Coba Insert
-        const { error: errInsert } = await _supabase
-            .from('laporan_makan')
-            .insert([{ 
-                nik_staff: s.nik, 
-                nama_staff: s.nama, 
-                divisi: s.divisi 
-            }]);
-
-        if(!errInsert) {
-            box.innerText = "✅ BERHASIL: " + s.nama; 
-            box.className = "p-3 rounded-xl bg-emerald-50 text-emerald-700 mb-4 font-bold border border-emerald-100 text-center";
-        } else if (errInsert.code === '23505') {
-            // Kode 23505 adalah Unique Violation (Sudah ada di database)
-            box.innerText = "❌ GAGAL: ANDA SUDAH SCAN HARI INI"; 
-            box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center"; 
-        } else {
-            box.innerText = "⚠️ GANGGUAN SISTEM";
-            console.error(errInsert);
-        }
-    } else { 
-        box.innerText = "❌ ID TIDAK DITEMUKAN / NON-AKTIF"; 
-        box.className = "p-3 rounded-xl bg-rose-50 text-rose-700 mb-4 font-bold border border-rose-100 text-center"; 
-    }
-
-    input.disabled = false;
-    input.value = ''; 
-    input.focus();
-    setTimeout(() => box.classList.add('hidden'), 4000);
-}
-        // --- EDIT STAFF MODAL ---
         async function openEditModal(nik, nama, divisi, status) {
             document.getElementById('edit-old-nik').value = nik;
             document.getElementById('edit-nama').value = nama;
@@ -613,7 +602,6 @@
             closeEditModal(); muatStaff();
         }
 
-        // --- SEARCH FILTER ---
         function filterTabelStaff() {
             const f = document.getElementById("search-staff").value.toUpperCase();
             const tr = document.getElementById("staff-table-body").getElementsByTagName("tr");
@@ -623,21 +611,33 @@
             }
         }
 
+        async function resetAllData() {
+            if(prompt("Ketik 'HAPUS' untuk reset semua data scan:") === 'HAPUS') {
+                await _supabase.from('laporan_makan').delete().neq('id', 0);
+                location.reload();
+            }
+        }
+
+        function updateClock() {
+            const n = new Date();
+            const clockEl = document.getElementById('clock');
+            const dateEl = document.getElementById('date-display');
+            if(clockEl) clockEl.innerText = n.toLocaleTimeString('id-ID', { hour12: false });
+            if(dateEl) dateEl.innerText = n.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+        }
+
         // --- INIT ---
         setInterval(updateClock, 1000);
         setInterval(cekStatusRegistrasi, 30000);
-        updateClock(); sinkronisasiMenu(); cekStatusRegistrasi();
+        updateClock(); 
+        sinkronisasiMenu(); 
+        cekStatusRegistrasi();
+        
+        // Inisialisasi Label Sesi Aktif saat pertama kali load
+        const labelScanInit = document.getElementById('label-sesi-aktif');
+        if(labelScanInit) labelScanInit.innerText = "Sesi Aktif: " + SESI_AKTIF;
+
         document.getElementById('nik-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') prosesKlaim(); });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
