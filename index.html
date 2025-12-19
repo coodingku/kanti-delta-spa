@@ -286,20 +286,17 @@
 // Fungsi Buka Tutup Jendela Chat
 function toggleChat() {
     const chat = document.getElementById('chat-window');
-    chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
+    if (chat) chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
 }
 
-// Fungsi Kirim Pesan ke Supabase
 async function kirimPesan() {
     const input = document.getElementById('chat-input');
     const pesanText = input.value;
     
-    // Ambil data staf dari session/localstorage (jika sudah scan)
     const nama = localStorage.getItem('nama_staff') || 'Staff'; 
     const divisi = localStorage.getItem('divisi') || 'Kantin';
 
     if (pesanText.trim() !== "") {
-        // Proses simpan ke database
         const { error } = await supabase
             .from('kantin_chat')
             .insert([{ 
@@ -309,31 +306,37 @@ async function kirimPesan() {
             }]);
 
         if (!error) {
-            input.value = ''; // Kosongkan input jika berhasil
+            input.value = ''; 
         } else {
             console.error("Gagal kirim chat:", error);
         }
     }
-} // <--- INI PENUTUP FUNGSI KIRIMPESAN YANG TADI HILANG
+}
 
-// Bagian Real-time (taruh di luar fungsi kirimPesan)
-supabase
-    .from('kantin_chat')
-    .on('INSERT', payload => {
-        const msg = payload.new;
-        const container = document.getElementById('message-container');
-        if(container) {
-            container.innerHTML += `
-                <div style="margin-bottom: 5px;">
-                    <b style="font-size: 11px; color: #075E54;">${msg.nama_staff}:</b><br>
-                    <span style="background: #f1f1f1; padding: 4px 8px; border-radius: 5px; display: inline-block;">
-                        ${msg.pesan}
-                    </span>
-                </div>`;
-            container.scrollTop = container.scrollHeight;
-        }
-    })
-    .subscribe();
+// Perbaikan: Bungkus bagian ini agar tidak error saat load
+window.onload = function() {
+    if (typeof supabase !== 'undefined' && typeof supabase.from === 'function') {
+        supabase
+            .from('kantin_chat')
+            .on('INSERT', payload => {
+                const msg = payload.new;
+                const container = document.getElementById('message-container');
+                if(container) {
+                    container.innerHTML += `
+                        <div style="margin-bottom: 5px;">
+                            <b style="font-size: 11px; color: #075E54;">${msg.nama_staff}:</b><br>
+                            <span style="background: #f1f1f1; padding: 4px 8px; border-radius: 5px; display: inline-block;">
+                                ${msg.pesan}
+                            </span>
+                        </div>`;
+                    container.scrollTop = container.scrollHeight;
+                }
+            })
+            .subscribe();
+    } else {
+        console.warn("Menunggu library Supabase... Refresh jika chat tidak muncul.");
+    }
+};
 
         // --- VARIABLE GLOBAL SESI ---
         let SESI_AKTIF = localStorage.getItem('kantin_sesi_aktif') || "Sesi 1";
@@ -706,6 +709,7 @@ supabase
     </script>
 </body>
 </html>
+
 
 
 
