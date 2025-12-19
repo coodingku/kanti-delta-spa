@@ -275,22 +275,18 @@
     </div>
 
 <script>
-    // --- PENGECEKAN KONEKSI (Baris 277) ---
-    // Jika 'supabase' sudah ada, kita gunakan yang sudah ada. 
-    // Jika belum ada, baru kita buat.
-    if (typeof supabase === 'undefined') {
-        const SB_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
-        
-        // Gunakan var agar bisa diakses secara global tanpa error 'already declared'
-        var supabase = Supabase.createClient(SB_URL, SB_KEY);
-    }
+    // --- KONFIGURASI KANTIN ---
+    const SB_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
 
-    // --- JEMBATAN UNTUK KODE LAMA ---
-    // Ini memperbaiki error "_supabase is not defined" di menu & registrasi
-    var _supabase = supabase;
+    // Inisialisasi menggunakan window.supabase (Standar CDN v2)
+    // Kita buat satu variabel 'supabase' dan satu '_supabase' agar semua fungsi puas
+    var supabase = window.supabase.createClient(SB_URL, SB_KEY);
+    var _supabase = supabase; 
 
-    // --- UTILITAS ---
+    // Pengecekan di Console untuk memastikan
+    console.log("Status Supabase:", supabase ? "Koneksi Siap" : "Koneksi Gagal");
+
     const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
     let chartDivisiInstance = null;
     let chartStatusInstance = null;
@@ -723,6 +719,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
