@@ -346,16 +346,17 @@ const bgColor = isMe ? '#dcf8c6' : '#ffffff'; // Hijau muda jika kita sendiri, p
 container.innerHTML += `
     // PASTIKAN BAGIAN INI DITULIS PERSIS SEPERTI INI
 container.innerHTML += `
-    <div style="margin-bottom: 12px; text-align: left;">
-        <div style="font-size: 10px; color: #666; font-weight: bold;">
-            ${msg.nama_staff ? msg.nama_staff.toUpperCase() : 'STAFF'}
-        </div>
-        <div style="background: white; padding: 8px; border-radius: 8px; display: inline-block; border: 1px solid #ddd;">
-            ${msg.pesan}
-        </div>
-    </div>`;
-// Pastikan baris di bawah ini ada tutup kurungnya!
-container.scrollTop = container.scrollHeight;
+    const msg = payload.new;
+                    const container = document.getElementById('message-container');
+                    if(container) {
+                        container.innerHTML += `
+                            <div style="margin-bottom: 5px;">
+                                <b style="font-size: 11px; color: #075E54;">${msg.nama_staff}:</b><br>
+                                <span style="background: #f1f1f1; padding: 4px 8px; border-radius: 5px; display: inline-block;">
+                                    ${msg.pesan}
+                                </span>
+                            </div>`;
+                        container.scrollTop = container.scrollHeight;
                     }
                 }
             )
@@ -766,6 +767,7 @@ loadChatHistory();
     </script>
 </body>
 </html>
+
 
 
 
