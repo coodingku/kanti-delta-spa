@@ -300,23 +300,24 @@ async function kirimPesan() {
 
     if (pesanText.trim() !== "") {
         const { error } = await supabase
-            .from('kantin_chat')
-            .insert([{ nama_staff: nama, pesan: pesanText, divisi: divisi }]);
-            
-        if (!error) input.value = ''; // Kosongkan input setelah kirim
-    }
-}
-
-// Berlangganan (Subscribe) ke Pesan Baru secara Real-time
+          // Berlangganan (Subscribe) Real-time untuk Supabase Versi Lama
 supabase
-    .channel('kantin_chat')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'kantin_chat' }, payload => {
+    .from('kantin_chat')
+    .on('INSERT', payload => {
         const msg = payload.new;
         const container = document.getElementById('message-container');
-        container.innerHTML += `<div><b>${msg.nama_staff} (${msg.divisi}):</b> ${msg.pesan}</div>`;
-        container.scrollTop = container.scrollHeight; // Auto scroll ke bawah
+        if(container) {
+            container.innerHTML += `
+                <div style="margin-bottom: 8px;">
+                    <small style="color: #666;">${msg.nama_staff} (${msg.divisi})</small><br>
+                    <span style="background: #e1ffc7; padding: 5px 10px; border-radius: 8px; display: inline-block;">
+                        ${msg.pesan}
+                    </span>
+                </div>`;
+            container.scrollTop = container.scrollHeight;
+        }
     })
-    .subscribe();  
+    .subscribe();
 
         // --- VARIABLE GLOBAL SESI ---
         let SESI_AKTIF = localStorage.getItem('kantin_sesi_aktif') || "Sesi 1";
@@ -689,5 +690,6 @@ supabase
     </script>
 </body>
 </html>
+
 
 
