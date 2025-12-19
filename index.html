@@ -325,29 +325,37 @@ async function kirimPesan() {
 }
 // Perbaikan: Bungkus bagian ini agar tidak error saat load
 window.onload = function() {
-    if (typeof supabase !== 'undefined' && typeof supabase.from === 'function') {
-        supabase
-            .from('kantin_chat')
-            .on('INSERT', payload => {
-                const msg = payload.new;
-                const container = document.getElementById('message-container');
-                if(container) {
-                    container.innerHTML += `
-                        <div style="margin-bottom: 5px;">
-                            <b style="font-size: 11px; color: #075E54;">${msg.nama_staff}:</b><br>
-                            <span style="background: #f1f1f1; padding: 4px 8px; border-radius: 5px; display: inline-block;">
-                                ${msg.pesan}
-                            </span>
-                        </div>`;
-                    container.scrollTop = container.scrollHeight;
+    // Pastikan library Supabase sudah siap
+    if (typeof supabase !== 'undefined' && typeof supabase.channel === 'function') {
+        
+        // --- SYNTAX VERSI 2 (v2) ---
+        const channel = supabase
+            .channel('kantin_chat_realtime') // Beri nama bebas untuk channel-nya
+            .on(
+                'postgres_changes', 
+                { event: 'INSERT', schema: 'public', table: 'kantin_chat' }, 
+                (payload) => {
+                    const msg = payload.new;
+                    const container = document.getElementById('message-container');
+                    if(container) {
+                        container.innerHTML += `
+                            <div style="margin-bottom: 5px;">
+                                <b style="font-size: 11px; color: #075E54;">${msg.nama_staff}:</b><br>
+                                <span style="background: #f1f1f1; padding: 4px 8px; border-radius: 5px; display: inline-block;">
+                                    ${msg.pesan}
+                                </span>
+                            </div>`;
+                        container.scrollTop = container.scrollHeight;
+                    }
                 }
-            })
+            )
             .subscribe();
+
+        console.log("Real-time Chat Kantin Aktif (v2)");
     } else {
-        console.warn("Menunggu library Supabase... Refresh jika chat tidak muncul.");
+        console.warn("Menunggu library Supabase v2...");
     }
 };
-
         // --- VARIABLE GLOBAL SESI ---
         let SESI_AKTIF = localStorage.getItem('kantin_sesi_aktif') || "Sesi 1";
 
@@ -719,6 +727,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
