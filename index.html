@@ -277,18 +277,15 @@
     <script>
 
 // --- KONFIGURASI UTAMA ---
-// Pastikan baris ini hanya ada SATU di seluruh file Anda
-if (typeof supabase === 'undefined') {
-    const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';// Gunakan key Anda
+ const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Gunakan pengecekan window untuk menghindari error "not defined"
-    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-}        
-// --- UTILITAS ---
-const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
+        const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
+        let chartDivisiInstance = null;
+        let chartStatusInstance = null;
 
-// --- FUNGSI CHAT ---
+// Fungsi Buka Tutup Jendela Chat
 function toggleChat() {
     const chat = document.getElementById('chat-window');
     if (chat) chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
@@ -718,6 +715,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
