@@ -356,6 +356,35 @@ window.onload = function() {
         console.warn("Menunggu library Supabase v2...");
     }
 };
+
+// Tambahkan ini di dalam window.onload, di atas kode .channel() tadi
+async function loadChatHistory() {
+    const { data, error } = await supabase
+        .from('kantin_chat')
+        .select('*')
+        .order('id', { ascending: true }) // Urutkan dari yang lama ke baru
+        .limit(20); // Ambil 20 pesan terakhir
+
+    if (data) {
+        const container = document.getElementById('message-container');
+        container.innerHTML = ''; // Bersihkan loading
+        data.forEach(msg => {
+            container.innerHTML += `
+                <div style="margin-bottom: 5px;">
+                    <b style="font-size: 11px; color: #075E54;">${msg.nama_staff}:</b><br>
+                    <span style="background: #f1f1f1; padding: 4px 8px; border-radius: 5px; display: inline-block;">
+                        ${msg.pesan}
+                    </span>
+                </div>`;
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+}
+
+// Panggil fungsinya
+loadChatHistory();
+
+    
         // --- VARIABLE GLOBAL SESI ---
         let SESI_AKTIF = localStorage.getItem('kantin_sesi_aktif') || "Sesi 1";
 
@@ -727,6 +756,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
