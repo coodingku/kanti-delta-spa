@@ -335,17 +335,26 @@ window.onload = function() {
                 'postgres_changes', 
                 { event: 'INSERT', schema: 'public', table: 'kantin_chat' }, 
                 (payload) => {
-                    const msg = payload.new;
-                    const container = document.getElementById('message-container');
-                    if(container) {
-                        container.innerHTML += `
-                            <div style="margin-bottom: 5px;">
-                                <b style="font-size: 11px; color: #075E54;">${msg.nama_staff}:</b><br>
-                                <span style="background: #f1f1f1; padding: 4px 8px; border-radius: 5px; display: inline-block;">
-                                    ${msg.pesan}
-                                </span>
-                            </div>`;
-                        container.scrollTop = container.scrollHeight;
+                   // Ganti bagian tampilan di dalam (payload) => { ... }
+const msg = payload.new;
+const container = document.getElementById('message-container');
+
+// Cek apakah pesan dari kita sendiri atau orang lain (opsional)
+const isMe = msg.nama_staff === localStorage.getItem('nama_staff');
+const bgColor = isMe ? '#dcf8c6' : '#ffffff'; // Hijau muda jika kita sendiri, putih jika orang lain
+
+container.innerHTML += `
+    <div style="margin-bottom: 12px; text-align: ${isMe ? 'right' : 'left'};">
+        <div style="font-size: 10px; color: #666; margin-bottom: 2px; font-weight: bold;">
+            ${msg.nama_staff.toUpperCase()} (${msg.divisi || 'Staff'})
+        </div>
+        <div style="background: ${bgColor}; padding: 8px 12px; border-radius: 10px; 
+                    display: inline-block; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                    border: 1px solid #eee; text-align: left;">
+            <span style="font-size: 13px; color: #333;">${msg.pesan}</span>
+        </div>
+    </div>`;
+container.scrollTop = container.scrollHeight;
                     }
                 }
             )
@@ -756,6 +765,7 @@ loadChatHistory();
     </script>
 </body>
 </html>
+
 
 
 
