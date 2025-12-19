@@ -344,16 +344,17 @@ const isMe = msg.nama_staff === localStorage.getItem('nama_staff');
 const bgColor = isMe ? '#dcf8c6' : '#ffffff'; // Hijau muda jika kita sendiri, putih jika orang lain
 
 container.innerHTML += `
-    <div style="margin-bottom: 12px; text-align: ${isMe ? 'right' : 'left'};">
-        <div style="font-size: 10px; color: #666; margin-bottom: 2px; font-weight: bold;">
-            ${msg.nama_staff.toUpperCase()} (${msg.divisi || 'Staff'})
+    // PASTIKAN BAGIAN INI DITULIS PERSIS SEPERTI INI
+container.innerHTML += `
+    <div style="margin-bottom: 12px; text-align: left;">
+        <div style="font-size: 10px; color: #666; font-weight: bold;">
+            ${msg.nama_staff ? msg.nama_staff.toUpperCase() : 'STAFF'}
         </div>
-        <div style="background: ${bgColor}; padding: 8px 12px; border-radius: 10px; 
-                    display: inline-block; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                    border: 1px solid #eee; text-align: left;">
-            <span style="font-size: 13px; color: #333;">${msg.pesan}</span>
+        <div style="background: white; padding: 8px; border-radius: 8px; display: inline-block; border: 1px solid #ddd;">
+            ${msg.pesan}
         </div>
     </div>`;
+// Pastikan baris di bawah ini ada tutup kurungnya!
 container.scrollTop = container.scrollHeight;
                     }
                 }
@@ -765,6 +766,7 @@ loadChatHistory();
     </script>
 </body>
 </html>
+
 
 
 
