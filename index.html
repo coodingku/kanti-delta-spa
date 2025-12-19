@@ -274,32 +274,33 @@
         </main>
     </div>
 
-    <script>
+<script>
+    // --- PENGECEKAN KONEKSI (Baris 277) ---
+    // Jika 'supabase' sudah ada, kita gunakan yang sudah ada. 
+    // Jika belum ada, baru kita buat.
+    if (typeof supabase === 'undefined') {
+        const SB_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
+        
+        // Gunakan var agar bisa diakses secara global tanpa error 'already declared'
+        var supabase = Supabase.createClient(SB_URL, SB_KEY);
+    }
 
-// --- KONFIGURASI UTAMA ---
-      // 1. Pastikan Library Supabase sudah dimuat di HTML Anda
-// 2. Gunakan blok inisialisasi ini:
+    // --- JEMBATAN UNTUK KODE LAMA ---
+    // Ini memperbaiki error "_supabase is not defined" di menu & registrasi
+    var _supabase = supabase;
 
-const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4'; // Gunakan key lengkap Anda
+    // --- UTILITAS ---
+    const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
+    let chartDivisiInstance = null;
+    let chartStatusInstance = null;
 
-// Membuat satu client utama
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// MEMBUAT JEMBATAN (PENTING!)
-// Agar kode lama yang memanggil '_supabase' tidak error
-const _supabase = supabase;
-
-        const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
-        let chartDivisiInstance = null;
-        let chartStatusInstance = null;
-
-// Fungsi Buka Tutup Jendela Chat
-function toggleChat() {
-    const chat = document.getElementById('chat-window');
-    if (chat) chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
-}
-
+    // Fungsi Buka Tutup Jendela Chat
+    function toggleChat() {
+        const chat = document.getElementById('chat-window');
+        if (chat) chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
+    }
+        
 async function kirimPesan() {
     const input = document.getElementById('chat-input');
     const pesanText = input.value;
@@ -722,6 +723,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
