@@ -294,26 +294,34 @@ async function kirimPesan() {
     const input = document.getElementById('chat-input');
     const pesanText = input.value;
     
-    const nama = localStorage.getItem('nama_staff') || 'Staff'; 
-    const divisi = localStorage.getItem('divisi') || 'Kantin';
+    // Pastikan kita menggunakan client yang benar
+    // Jika di bagian atas file Anda menggunakan nama lain, sesuaikan di sini
+    if (typeof supabase === 'undefined' || typeof supabase.from !== 'function') {
+        console.error("Koneksi Supabase belum siap atau salah inisialisasi");
+        alert("Sistem chat sedang gangguan, silakan refresh halaman.");
+        return;
+    }
 
     if (pesanText.trim() !== "") {
-        const { error } = await supabase
-            .from('kantin_chat')
-            .insert([{ 
-                nama_staff: nama, 
-                pesan: pesanText, 
-                divisi: divisi 
-            }]);
+        try {
+            const { error } = await supabase
+                .from('kantin_chat')
+                .insert([{ 
+                    nama_staff: localStorage.getItem('nama_staff') || 'Staff', 
+                    pesan: pesanText, 
+                    divisi: localStorage.getItem('divisi') || 'Kantin' 
+                }]);
 
-        if (!error) {
-            input.value = ''; 
-        } else {
-            console.error("Gagal kirim chat:", error);
+            if (!error) {
+                input.value = ''; 
+            } else {
+                console.error("Error dari Supabase:", error.message);
+            }
+        } catch (err) {
+            console.error("Gagal menjalankan perintah .from():", err);
         }
     }
 }
-
 // Perbaikan: Bungkus bagian ini agar tidak error saat load
 window.onload = function() {
     if (typeof supabase !== 'undefined' && typeof supabase.from === 'function') {
@@ -710,6 +718,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
