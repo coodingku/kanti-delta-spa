@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="icon" href="data:,">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -276,9 +277,18 @@
     <script>
 
 // --- KONFIGURASI UTAMA ---
-        const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      // 1. Pastikan Library Supabase sudah dimuat di HTML Anda
+// 2. Gunakan blok inisialisasi ini:
+
+const SUPABASE_URL = 'https://jfcppvzxqtuvlojhuftb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmY3Bwdnp4cXR1dmxvamh1ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NzQ2NTIsImV4cCI6MjA4MTU1MDY1Mn0.L1uunUfLBaSkVzTDVQa0QlZEdBH0PyZprnZQ7I_pRj4'; // Gunakan key lengkap Anda
+
+// Membuat satu client utama
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// MEMBUAT JEMBATAN (PENTING!)
+// Agar kode lama yang memanggil '_supabase' tidak error
+const _supabase = supabase;
 
         const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n);
         let chartDivisiInstance = null;
@@ -293,18 +303,16 @@ function toggleChat() {
 async function kirimPesan() {
     const input = document.getElementById('chat-input');
     const pesanText = input.value;
-    
-    // Gunakan window.supabase untuk memastikan mengambil client utama
-    const client = window.supabase;
 
-    if (!client || typeof client.from !== 'function') {
-        console.error("Supabase Client tidak ditemukan atau tidak valid!");
+    // Gunakan 'supabase' yang sudah kita buat di atas
+    if (typeof supabase === 'undefined') {
+        console.error("Koneksi Supabase belum terinisialisasi");
         return;
     }
 
     if (pesanText.trim() !== "") {
-        const { error } = await client
-            .from('kantin_chat') // Nama tabel untuk chatting di Kantin
+        const { error } = await supabase
+            .from('kantin_chat')
             .insert([{ 
                 nama_staff: localStorage.getItem('nama_staff') || 'Staff', 
                 pesan: pesanText, 
@@ -314,7 +322,7 @@ async function kirimPesan() {
         if (!error) {
             input.value = ''; 
         } else {
-            console.error("Gagal mengirim ke database:", error.message);
+            console.error("Gagal kirim chat:", error.message);
         }
     }
 }
@@ -714,6 +722,7 @@ window.onload = function() {
     </script>
 </body>
 </html>
+
 
 
 
