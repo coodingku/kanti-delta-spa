@@ -546,7 +546,7 @@ loadChatHistory();
                 document.getElementById('scan-container').classList.remove('hidden');
                 document.getElementById('no-menu-msg').classList.add('hidden');
             } else {
-                document.getElementById('display-menu-hari-ini').innerText = "BELUM INPUT MENU";
+                document.getElementById('display-menu-hari-ini').innerText = "Kami informasikan bahwa layanan Kantin sudah tidak lagi beroperasi. Terima kasih kepada seluruh staff .";
                 document.getElementById('scan-container').classList.add('hidden');
                 document.getElementById('no-menu-msg').classList.remove('hidden');
             }
@@ -706,7 +706,7 @@ loadChatHistory();
         function showPage(p) {
             if(p==='admin') {
                 const pass = prompt("Password Admin:");
-                if(pass !== "kantin1234") return;
+                if(pass !== "Bali2332") return;
                 document.getElementById('page-admin').classList.remove('hidden');
                 document.getElementById('page-scan').classList.add('hidden');
                 const selectSesi = document.getElementById('select-sesi-manual');
@@ -778,6 +778,7 @@ loadChatHistory();
     </script>
 </body>
 </html>
+
 
 
 
